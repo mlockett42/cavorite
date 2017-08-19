@@ -2,6 +2,7 @@
 from __future__ import absolute_import, unicode_literals, print_function
 import js
 import copy
+import itertools
 
 class TextNode(object):
     def __init__(self, text):
@@ -9,6 +10,15 @@ class TextNode(object):
 
     def _render(self, element):
         return js.globals.document.createTextNode(self.text)
+
+    def _build_virtual_dom(self):
+        return TextNode(self.text)
+
+    def _get_dom_changes(self, virtual_dom2):
+        if self.text != virtual_dom2.text:
+            return [(self, virtual_dom2)]
+        else:
+            return []
 
 t = TextNode
 
@@ -19,6 +29,7 @@ class VNode(object):
         self.attribs = dict()
         self.children = list()
         self.parent = None
+        self.virtual_dom = None
         if len(args) == 2:
             self.attribs = args[0]
             if isinstance(args[1], list):
@@ -56,6 +67,7 @@ class VNode(object):
 
     def _render(self, element):
         new_element = js.globals.document.createElement(self.tag)
+        self.dom_element = new_element
         for k, v in self.get_attribs().items():
             if callable(v):
                 setattr(new_element, k, v)
@@ -65,6 +77,47 @@ class VNode(object):
             child_element = child._render(new_element)
             new_element.appendChild(child_element)
         return new_element
+
+    def _build_virtual_dom(self):
+        clone = VNode(self.tag, copy.copy(self.attribs))
+        for child in self.get_children():
+            clone.children.append(child._build_virtual_dom())
+        return clone        
+
+    def mount(self, element):
+        assert self.parent is None, 'You can only mount the root node'
+        self._virtual_dom = self._build_virtual_dom()
+        self._virtual_dom.render(element)
+        self.mounted_element = element
+
+    def _get_dom_changes(self, virtual_dom2):
+        if self.tag != virtual_dom2.tag or self.attribs != virtual_dom2.attribs or \
+            len(self.children) != len(virtual_dom2.children):
+                return [(self, virtual_dom2)]
+        r = [self.children[i]._get_dom_changes(virtual_dom2.children[i]) for i in range(len(self.children))]
+        return itertools.chain.from_iterable(r)
+
+
+    def mount_redraw(self):
+        virtual_dom2 = self._build_virtual_dom()
+        elements_to_change = self._virtual_dom._get_dom_changes(virtual_dom2)
+        if any([live_vnode.parent is None for (live_vnode, new_vnode) in elements_to_change]):
+            # If the root node has changed just redraw everything the rest of our logic in irrelevant
+            self.render(self.mounted_element)
+        else:
+            for (live_vnode, new_vnode) in elements_to_change:
+                live_parent = live_vnode.parent
+                new_element = new_vnode._render()
+                i = live_parent.children.index(live_vnode)
+                live_parent.children[i] = new_vnode
+                live_nvode.dom_element.replaceWith(new_vnode.dom_element)
+
+    def get_root(self):
+        if self.parent is None:
+            return self
+        else:
+            return self.parent.get_root()
+        
 
 c = VNode
 
