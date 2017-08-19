@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals, print_function
 import js
+import copy
 
 class TextNode(object):
     def __init__(self, text):
@@ -40,11 +41,27 @@ class VNode(object):
         new_element = self._render(element)
         element.appendChild(new_element)
 
+    def get_attribs(self):
+        attribs = dict()
+        for k, v in self.attribs.items():
+            if callable(v):
+                attribs[k] = js.Function(v)
+            else:
+                attribs[k] = v
+        
+        return attribs
+
+    def get_children(self):
+        return self.children
+
     def _render(self, element):
         new_element = js.globals.document.createElement(self.tag)
-        for k, v in self.attribs.items():
-            new_element.setAttribute(k, v)
-        for child in self.children:
+        for k, v in self.get_attribs().items():
+            if callable(v):
+                setattr(new_element, k, v)
+            else:
+                new_element.setAttribute(k, v)
+        for child in self.get_children():
             child_element = child._render(new_element)
             new_element.appendChild(child_element)
         return new_element
