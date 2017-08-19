@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals, print_function
+import js
 
 class TextNode(object):
     def __init__(self, text):
@@ -7,6 +8,9 @@ class TextNode(object):
 
     def _output(self):
         return self.text
+
+    def _render(self, element):
+        return js.globals.document.createTextNode(self.text)
 
 t = TextNode
 
@@ -38,10 +42,19 @@ class VNode(object):
             ">" + "".join([child._output() for child in self.children]) + "</" + self.tag + ">"
 
     def render(self, element):
-        if self.parent is not None:
-            self.parent.render(element)
-        else:
-            element.innerHTML = self._output()
+        while element.hasChildNodes():
+            element.removeChild(element.lastChild)
+        new_element = self._render(element)
+        element.appendChild(new_element)
+
+    def _render(self, element):
+        new_element = js.globals.document.createElement(self.tag)
+        for k, v in self.attribs.items():
+            new_element.setAttribute(k, v)
+        for child in self.children:
+            child_element = child._render(new_element)
+            new_element.appendChild(child_element)
+        return new_element
 
 c = VNode
 
