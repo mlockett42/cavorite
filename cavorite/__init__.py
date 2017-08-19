@@ -6,9 +6,6 @@ class TextNode(object):
     def __init__(self, text):
         self.text = text
 
-    def _output(self):
-        return self.text
-
     def _render(self, element):
         return js.globals.document.createTextNode(self.text)
 
@@ -36,10 +33,6 @@ class VNode(object):
                 self.children = [TextNode(args[0])]
         for child in self.children:
             child.parent = self
-
-    def _output(self):
-        return "<" + self.tag + "".join([" " + k + '="' + v + '"' for (k, v) in self.attribs.items()]) + \
-            ">" + "".join([child._output() for child in self.children]) + "</" + self.tag + ">"
 
     def render(self, element):
         while element.hasChildNodes():
