@@ -3,6 +3,7 @@ from __future__ import absolute_import, unicode_literals, print_function
 import js
 import copy
 import itertools
+import re
 
 class TextNode(object):
     def __init__(self, text):
@@ -121,4 +122,32 @@ class VNode(object):
 
 c = VNode
 
+class Router(object):
+    def __init__(self, routes, defaultroute, dom_element):
+        self.routes = routes
+        self.defaultroute = defaultroute
+        self.dom_element = dom_element
+        js.globals.document.body.onhashchange=js.Function(self.onhashchange)
+
+    def route(self):
+        url_sections = str(js.globals.window.location.href).split('#!', 1)
+        if len(url_sections) == 2:
+            url = url_sections[1]
+        else:
+            url = ''
+        route = None
+        for k, v in self.routes.items():
+            p = re.compile(k)
+            m = p.search(url)
+            if m:
+                route = v
+                route.url_kwargs = m.groupdict()
+        if route is None:
+            route = self.defaultroute
+            route.url_kwargs = { }
+        route.mount(self.dom_element)
+
+    def onhashchange(self, e):
+        self.route()
+            
 
