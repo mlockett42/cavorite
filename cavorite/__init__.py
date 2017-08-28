@@ -146,6 +146,7 @@ class Router(object):
             route = self.defaultroute
             route.url_kwargs = { }
         route.mount(self.dom_element)
+        js.globals.document.body.onhashchange=js.Function(self.onhashchange)
 
     def onhashchange(self, e):
         self.route()
