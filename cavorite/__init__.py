@@ -8,6 +8,7 @@ import copy
 import itertools
 import re
 
+
 class TextNode(object):
     def __init__(self, text):
         self.text = text
@@ -27,7 +28,7 @@ class TextNode(object):
 t = TextNode
 
 class VNode(object):
-    def __init__(self, tag, attribs=None, children=None):
+    def __init__(self, tag, attribs=None, children=None, cssClass=None, **kwargs):
         self.tag = tag
         self.attribs = dict()
         self.children = []
@@ -55,6 +56,19 @@ class VNode(object):
                 self.children = attribs
             if isinstance(attribs, basestring):
                 self.children = [TextNode(attribs)]
+        if cssClass is not None:
+            assert 'class' not in self.attribs, 'Cannot define css class twice'
+            self.attribs['class'] = cssClass
+        if 'class' in self.attribs and isinstance(self.attribs['class'], list):
+            self.attribs['class'] = ' '.join(self.attribs['class'])
+
+        # Make sure no parameters are in both the attribs and the kwargs
+        attrib_set = set(self.attribs.keys())
+        kwargs_set = set(kwargs.keys())
+        assert attrib_set.isdisjoint(kwargs_set)
+
+        # Merge any kwargs into the attribs
+        self.attribs.update(kwargs)
 
 
     def render(self, element):

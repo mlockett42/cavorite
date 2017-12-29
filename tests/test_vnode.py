@@ -6,7 +6,7 @@ import tests.fakejs as js
 import pytest
 
 
-class TestAttribs(object):
+class TestChildren(object):
     def test_children(self):
         node = c('div', [t('Hello'), t('World')])
         children = node.get_children()
@@ -59,4 +59,20 @@ class TestAttribs(object):
         node = c('div', {'class': 'stuff'})
         assert node.get_attribs() == {'class': 'stuff'}
         assert node.get_children() == []
+
+
+class TestAttribs(object):
+    def test_attribs(self):
+        node = c('div', cssClass='stuff')
+        assert node.get_attribs() == {'class': 'stuff'}
+        assert node.get_children() == []
+
+    def test_kwarg_and_attribs_dict(self):
+        with pytest.raises(AssertionError):
+            node = c('div', {'class': 'stuff'}, cssClass='stuff')
+
+    def test_class_list_of_strings(self):
+        node = c('div', cssClass=['good', 'stuff'])
+        assert node.get_attribs() == {'class': 'good stuff'}
+        
 
