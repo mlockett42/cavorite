@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals, print_function
-import js
+try:
+    import js
+except ImportError:
+    js = None
 import copy
 import itertools
 import re
