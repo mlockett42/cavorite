@@ -47,8 +47,6 @@ class VNode(object):
                 self.children = args[0]
             if isinstance(args[0], basestring):
                 self.children = [TextNode(args[0])]
-        for child in self.children:
-            child.parent = self
 
     def render(self, element):
         while element.hasChildNodes():
@@ -67,7 +65,13 @@ class VNode(object):
         return attribs
 
     def get_children(self):
-        return self.children
+        ret = []
+        for child in self.children:
+            node = child() if callable(child) else child
+            node.parent = self
+            ret.append(node)
+        return ret
+        
 
     def _render(self, element):
         new_element = js.globals.document.createElement(self.tag)

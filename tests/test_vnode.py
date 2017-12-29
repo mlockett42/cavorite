@@ -14,4 +14,19 @@ class TestAttribs(object):
         assert children[0].text == 'Hello'
         assert children[1].text == 'World'
 
+    def test_child_callables(self):
+        # Test that our children can be callables and that they only
+        # run when get_children is called
+        world_was_run = {'was_run': False}
+        def world():
+            world_was_run['was_run'] = True
+            return t('World')
+
+        node = c('div', [t('Hello'), world])
+        assert world_was_run['was_run'] == False
+        children = node.get_children()
+        assert len(children) == 2
+        assert children[0].text == 'Hello'
+        assert children[1].text == 'World'
+        assert world_was_run['was_run'] == True
 
