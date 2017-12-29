@@ -27,26 +27,35 @@ class TextNode(object):
 t = TextNode
 
 class VNode(object):
-    def __init__(self, tag, *args):
+    def __init__(self, tag, attribs=None, children=None):
         self.tag = tag
-        assert len(args) <= 2
         self.attribs = dict()
-        self.children = list()
+        self.children = []
         self.parent = None
         self.virtual_dom = None
-        if len(args) == 2:
-            self.attribs = args[0]
-            if isinstance(args[1], list):
-                self.children = args[1]
-            if isinstance(args[1], basestring):
-                self.children = [TextNode(args[1])]
-        if len(args) == 1:
-            if isinstance(args[0], dict):
-                self.attribs = args[0]
-            if isinstance(args[0], list):
-                self.children = args[0]
-            if isinstance(args[0], basestring):
-                self.children = [TextNode(args[0])]
+        if children is not None:
+            assert isinstance(attribs, dict) or attribs is None, 'attribs must be a dict'
+        if attribs is not None and children is not None:
+            self.attribs = attribs
+            if isinstance(children, list) or callable(children):
+                self.children = children
+            if isinstance(children, basestring):
+                self.children = [TextNode(children)]
+        if attribs is None and children is not None:
+            self.attribs = { }
+            if isinstance(children, list) or callable(children):
+                self.children = children
+            if isinstance(children, basestring):
+                self.children = [TextNode(children)]
+        if attribs is not None and children is None:
+            # If the first argument after the tag is a list or string it is actually the children
+            if isinstance(attribs, dict):
+                self.attribs = attribs
+            if isinstance(attribs, list):
+                self.children = attribs
+            if isinstance(attribs, basestring):
+                self.children = [TextNode(attribs)]
+
 
     def render(self, element):
         while element.hasChildNodes():
@@ -65,6 +74,8 @@ class VNode(object):
         return attribs
 
     def get_children(self):
+        if callable(self.children):
+            return self.children()
         ret = []
         for child in self.children:
             node = child() if callable(child) else child
