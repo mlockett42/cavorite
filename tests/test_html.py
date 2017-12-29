@@ -29,5 +29,9 @@ class TestTags(object):
         with pytest.raises(AssertionError):
             tag = a({'href': 'https://www.google.com'}, cssClass='stuff', href='https://www.google.com')
 
+    def test_html_button(self):
+        tag = html_button(cssClass='stuff')
+        assert tag.get_attribs() == {'class': 'stuff'}
+
     
 
