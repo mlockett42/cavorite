@@ -76,3 +76,13 @@ class TestAttribs(object):
         assert node.get_attribs() == {'class': 'good stuff'}
         
 
+class TestStyle(object):
+    def test_text_style(self):
+        node = c("div", {'style':"padding: 0px 10px 0px 0px; color:white;"})
+        assert node.get_attribs()['style'] == "padding: 0px 10px 0px 0px; color:white;"
+
+    def test_dict_style(self):
+        node = c("div", {'style':{"padding": "0px 10px 0px 0px", "color":"white"}})
+        assert node.get_attribs()['style'] == "padding: 0px 10px 0px 0px; color: white;" or \
+            node.get_attribs()['style'] == "color:w hite; padding: 0px 10px 0px 0px;", node.get_attribs()['style']
+

@@ -70,6 +70,12 @@ class VNode(object):
         # Merge any kwargs into the attribs
         self.attribs.update(kwargs)
 
+        # If we were given the style as a dict make it into a string
+        if 'style' in self.attribs and isinstance(self.attribs['style'], dict):
+            d = self.attribs['style']
+            l = [k + ': ' + v + ';' for k, v in d.items()]
+            self.attribs['style'] = ' '.join(l)
+
 
     def render(self, element):
         while element.hasChildNodes():
