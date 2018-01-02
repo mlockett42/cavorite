@@ -38,7 +38,7 @@ class VNode(object):
         self.parent = None
         self.virtual_dom = None
         if children is not None:
-            assert isinstance(attribs, dict) or attribs is None, 'attribs must be a dict'
+            assert isinstance(attribs, dict) or attribs is None, 'attribs must be a dict attribs={} type={}'.format(attribs, type(attribs))
         if attribs is not None and children is not None:
             self.attribs = attribs
             if isinstance(children, list) or callable(children):
