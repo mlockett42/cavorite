@@ -15,23 +15,30 @@ class TestTags(object):
             assert obj.tag == tagname
 
             obj2 = theclass({'class': 'stuff'}, [t('Hello'), t('World')])
-            assert obj2.get_attribs() == {'class': 'stuff'}
+            assert obj2.get_attribs()['class'] =='stuff'
+            assert '_cavorite_id' in obj2.get_attribs()
+            assert len(obj2.get_attribs()) == 2
             children = obj2.get_children()
             assert len(children) == 2
             assert children[0].text == 'Hello'
             assert children[1].text == 'World'
 
     def test_href(self):
-        tag = a(cssClass='stuff', href='https://www.google.com')
-        assert tag.get_attribs() == {'class': 'stuff',  'href':'https://www.google.com'}
+        node = a(cssClass='stuff', href='https://www.google.com')
+        assert node.get_attribs()['class'] =='stuff'
+        assert node.get_attribs()['href'] =='https://www.google.com'
+        assert '_cavorite_id' in node.get_attribs()
+        assert len(node.get_attribs()) == 3
 
     def test_attrib_kwarg_and_arg(self):
         with pytest.raises(AssertionError):
             tag = a({'href': 'https://www.google.com'}, cssClass='stuff', href='https://www.google.com')
 
     def test_html_button(self):
-        tag = html_button(cssClass='stuff')
-        assert tag.get_attribs() == {'class': 'stuff'}
+        node = html_button(cssClass='stuff')
+        assert node.get_attribs()['class'] =='stuff'
+        assert '_cavorite_id' in node.get_attribs()
+        assert len(node.get_attribs()) == 2
 
     
 

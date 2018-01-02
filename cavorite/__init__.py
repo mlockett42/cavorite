@@ -7,6 +7,8 @@ except ImportError:
 import copy
 import itertools
 import re
+import uuid
+from . import callbacks
 
 
 class TextNode(object):
@@ -26,6 +28,7 @@ class TextNode(object):
             return []
 
 t = TextNode
+
 
 class VNode(object):
     def __init__(self, tag, attribs=None, children=None, cssClass=None, **kwargs):
@@ -75,6 +78,8 @@ class VNode(object):
             d = self.attribs['style']
             l = [k + ': ' + v + ';' for k, v in d.items()]
             self.attribs['style'] = ' '.join(l)
+        if '_cavorite_id' not in self.attribs:
+            self.attribs['_cavorite_id'] = uuid.uuid4().hex
 
 
     def render(self, element):
@@ -86,10 +91,10 @@ class VNode(object):
     def get_attribs(self):
         attribs = dict()
         for k, v in self.attribs.items():
-            if callable(v):
-                attribs[k] = js.Function(v)
-            else:
-                attribs[k] = v
+            #if callable(v):
+            #    attribs[k] = js.Function(v)
+            #else:
+            attribs[k] = v
         
         return attribs
 
@@ -108,8 +113,11 @@ class VNode(object):
         new_element = js.globals.document.createElement(self.tag)
         self.dom_element = new_element
         for k, v in self.get_attribs().items():
-            if callable(v):
-                setattr(new_element, k, v)
+            if k == 'onclick':
+                callbacks.global_callbacks['onclick'][self.attribs['_cavorite_id']] = v
+                setattr(new_element,k, callbacks.global_onclick_handler)
+            #elif callable(v):
+            #    sew_element.setAttribute(k, v())
             else:
                 new_element.setAttribute(k, v)
         for child in self.get_children():
