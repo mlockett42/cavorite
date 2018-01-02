@@ -87,7 +87,20 @@ class TestAttribs(object):
         assert node.get_attribs()['class'] =='good stuff'
         assert '_cavorite_id' in node.get_attribs()
         assert len(node.get_attribs()) == 2
+
+    def test_attribs_can_be_callables(self, monkeypatch):
+        monkeypatch.setattr(cavorite.cavorite, 'js', js)
+        def class_callback():
+            return value
+        node = c('div', {'class': class_callback})
+
+        value = 'hello'
+        rendered_node = node._render(None)
+        assert rendered_node.getAttribute('class') == 'hello'
         
+        value = 'world'
+        rendered_node = node._render(None)
+        assert rendered_node.getAttribute('class') == 'world'
 
 class TestStyle(object):
     def test_text_style(self):
@@ -165,4 +178,5 @@ class TestCallables(object):
         e = Mock(target=rendered_node)
         rendered_node.onclick(e)
         assert counter['counter'] == 1
+
         

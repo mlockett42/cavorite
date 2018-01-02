@@ -89,14 +89,7 @@ class VNode(object):
         element.appendChild(new_element)
 
     def get_attribs(self):
-        attribs = dict()
-        for k, v in self.attribs.items():
-            #if callable(v):
-            #    attribs[k] = js.Function(v)
-            #else:
-            attribs[k] = v
-        
-        return attribs
+        return self.attribs
 
     def get_children(self):
         if callable(self.children):
@@ -116,8 +109,8 @@ class VNode(object):
             if k == 'onclick':
                 callbacks.global_callbacks['onclick'][self.attribs['_cavorite_id']] = v
                 setattr(new_element,k, callbacks.global_onclick_handler)
-            #elif callable(v):
-            #    sew_element.setAttribute(k, v())
+            elif callable(v):
+                new_element.setAttribute(k, v())
             else:
                 new_element.setAttribute(k, v)
         for child in self.get_children():
