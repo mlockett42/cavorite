@@ -13,7 +13,10 @@ def createElement(tag):
     ret = MockElement()
     return ret
 
-document = Mock(createElement=createElement)
+def createTextNode(s):
+    return s
+
+document = Mock(createElement=createElement, createTextNode=createTextNode)
 
 globals = Mock(document=document)
 
@@ -25,4 +28,6 @@ def Function(fn):
         fn(*args, **kwargs)
     wrapper.is_fake_js_func = True
     return wrapper
+
+
 

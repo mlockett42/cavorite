@@ -11,12 +11,19 @@ import uuid
 from . import callbacks
 
 
+def lazy_eval(v):
+    if callable(v):
+        return v()
+    else:
+        return v
+
+
 class TextNode(object):
     def __init__(self, text):
         self.text = text
 
     def _render(self, element):
-        return js.globals.document.createTextNode(self.text)
+        return js.globals.document.createTextNode(lazy_eval(self.text))
 
     def _build_virtual_dom(self):
         return TextNode(self.text)
