@@ -26,7 +26,7 @@ class TextNode(object):
         return js.globals.document.createTextNode(lazy_eval(self.text))
 
     def _build_virtual_dom(self):
-        return TextNode(self.text)
+        return TextNode(lazy_eval(self.text))
 
     def _get_dom_changes(self, virtual_dom2):
         if self.text != virtual_dom2.text:
@@ -100,9 +100,11 @@ class VNode(object):
 
     def get_children(self):
         if callable(self.children):
-            return self.children()
+            children = self.children()
+        else:
+            children = self.children
         ret = []
-        for child in self.children:
+        for child in children:
             node = child() if callable(child) else child
             node.parent = self
             ret.append(node)
@@ -147,17 +149,17 @@ class VNode(object):
 
     def mount_redraw(self):
         virtual_dom2 = self._build_virtual_dom()
-        elements_to_change = self._virtual_dom._get_dom_changes(virtual_dom2)
+        elements_to_change = list(self._virtual_dom._get_dom_changes(virtual_dom2))
         if any([live_vnode.parent is None for (live_vnode, new_vnode) in elements_to_change]):
             # If the root node has changed just redraw everything the rest of our logic in irrelevant
             self.render(self.mounted_element)
         else:
             for (live_vnode, new_vnode) in elements_to_change:
                 live_parent = live_vnode.parent
-                new_element = new_vnode._render()
+                new_element = new_vnode._render(live_parent)
                 i = live_parent.children.index(live_vnode)
                 live_parent.children[i] = new_vnode
-                live_nvode.dom_element.replaceWith(new_vnode.dom_element)
+                live_vnode.dom_element.replaceWith(new_vnode.dom_element)
 
     def get_root(self):
         if self.parent is None:

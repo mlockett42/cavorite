@@ -14,10 +14,12 @@ class TestTextNode(object):
         text_node = t('Hello world')
         assert text_node._render(None) == 'Hello world'
 
-
     def test_text_as_callable(self, monkeypatch):
         monkeypatch.setattr(cavorite.cavorite, 'js', js)
         text_node = t(lambda: 'Hello world')
         assert text_node._render(None) == 'Hello world'
+
+        text_node2 = text_node._build_virtual_dom()
+        assert text_node2.text == 'Hello world'
 
 

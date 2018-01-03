@@ -69,6 +69,16 @@ class TestChildren(object):
         assert len(node.get_attribs()) == 2
         assert node.get_children() == []
 
+    def test_get_children_from_callable_sets_parent(self):
+        def get_children():
+            return [c('p', 'Hello'), c('p', 'World')]
+
+        node = c('div', children=get_children)
+        children = node.get_children()
+        assert len(children) == 2
+        assert children[0].parent == node
+        assert children[1].parent == node
+
 
 class TestAttribs(object):
     def test_attribs(self):
