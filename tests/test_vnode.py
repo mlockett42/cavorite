@@ -6,7 +6,7 @@ import sys
 import tests.fakejs as js
 import pytest
 import uuid
-from mock import Mock
+from mock import Mock, patch
 
 
 c = cavorite.cavorite.c
@@ -168,10 +168,13 @@ class TestCallables(object):
         callbacks.initialise_global_callbacks()
         def dummy_callback():
             pass
-        node = c("div", {'onclick': dummy_callback})
+        node = c("div", {'onclick': dummy_callback,
+                         'onchange': dummy_callback})
         rendered_node = node._render(None)
         assert rendered_node.onclick.is_fake_js_func, 'Check is a function wrapped by js.Function'
         assert rendered_node.onclick != dummy_callback, 'We need to actually wrap that function'
+        assert rendered_node.onchange.is_fake_js_func, 'Check is a function wrapped by js.Function'
+        assert rendered_node.onchange != dummy_callback, 'We need to actually wrap that function'
         
     def test_click_routing(self, monkeypatch):
         monkeypatch.setattr(cavorite.cavorite, 'js', js)
@@ -180,13 +183,38 @@ class TestCallables(object):
         counter = {'counter': 0}
         def dummy_callback(e):
             counter['counter'] += 1
-        node = c("div", {'onclick': dummy_callback})
+        node = c("div", {'onclick': dummy_callback,
+                         'onchange': dummy_callback})
         rendered_node = node._render(None)
         global_callbacks = callbacks.global_callbacks
-        assert global_callbacks == {'onclick': {rendered_node.getAttribute('_cavorite_id'): dummy_callback}}
+        assert global_callbacks == {'onclick': {rendered_node.getAttribute('_cavorite_id'): dummy_callback},
+                                    'onchange': {rendered_node.getAttribute('_cavorite_id'): dummy_callback},
+                                    }
 
         e = Mock(target=rendered_node)
         rendered_node.onclick(e)
         assert counter['counter'] == 1
+        rendered_node.onchange(e)
+        assert counter['counter'] == 2
 
+class TestVNodeCloning(object):
+    def test_default_original_none(self):
+        node = c("div")
+        assert node.original == None
+
+    def test_original_points_correctly_in_virtual_dom(self):
+        node = c("div")
+        virtual_node = node._build_virtual_dom()
+        assert virtual_node.original == node
         
+    def test_was_rendered_was_called(self, monkeypatch):
+        counter = {'counter': 0}
+        def dummy_callback(e):
+            counter['counter'] += 1
+        monkeypatch.setattr(cavorite.cavorite, 'js', js)
+        monkeypatch.setattr(c, 'was_rendered', dummy_callback)
+        node = c("div")
+        virtual_node = node._build_virtual_dom()
+        virtual_node._render(None)
+        assert counter['counter'] == 1
+

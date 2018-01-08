@@ -21,12 +21,21 @@ def lazy_eval(v):
 class TextNode(object):
     def __init__(self, text):
         self.text = text
+        self.original = None
 
     def _render(self, element):
-        return js.globals.document.createTextNode(lazy_eval(self.text))
+        ret = js.globals.document.createTextNode(lazy_eval(self.text))
+        if self.original:
+            self.original.was_rendered()
+        return ret
+
+    def was_rendered(self):
+        pass
 
     def _build_virtual_dom(self):
-        return TextNode(lazy_eval(self.text))
+        ret = TextNode(lazy_eval(self.text))
+        ret.original = self
+        return ret
 
     def _get_dom_changes(self, virtual_dom2):
         if self.text != virtual_dom2.text:
@@ -44,6 +53,7 @@ class VNode(object):
         self.children = []
         self.parent = None
         self.virtual_dom = None
+        self.original = None
         if children is not None:
             assert isinstance(attribs, dict) or attribs is None, 'attribs must be a dict attribs={} type={}'.format(attribs, type(attribs))
         if attribs is not None and children is not None:
@@ -110,14 +120,13 @@ class VNode(object):
             ret.append(node)
         return ret
         
-
     def _render(self, element):
         new_element = js.globals.document.createElement(self.tag)
         self.dom_element = new_element
         for k, v in self.get_attribs().items():
-            if k == 'onclick':
-                callbacks.global_callbacks['onclick'][self.attribs['_cavorite_id']] = v
-                setattr(new_element,k, callbacks.global_onclick_handler)
+            if k in callbacks.global_callback_handlers:
+                callbacks.global_callbacks[k][self.attribs['_cavorite_id']] = v
+                setattr(new_element,k, callbacks.global_callback_handlers[k])
             elif callable(v):
                 new_element.setAttribute(k, v())
             else:
@@ -125,10 +134,16 @@ class VNode(object):
         for child in self.get_children():
             child_element = child._render(new_element)
             new_element.appendChild(child_element)
+        if self.original:
+            self.original.was_rendered()
         return new_element
+
+    def was_rendered(self):
+        pass
 
     def _build_virtual_dom(self):
         clone = VNode(self.tag, copy.copy(self.attribs))
+        clone.original = self
         for child in self.get_children():
             clone.children.append(child._build_virtual_dom())
         return clone        
