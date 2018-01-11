@@ -54,6 +54,7 @@ class VNode(object):
         self.parent = None
         self.virtual_dom = None
         self.original = None
+        self.inject_script_tags = False
         if children is not None:
             assert isinstance(attribs, dict) or attribs is None, 'attribs must be a dict attribs={} type={}'.format(attribs, type(attribs))
         if attribs is not None and children is not None:
@@ -152,6 +153,33 @@ class VNode(object):
         assert self.parent is None, 'You can only mount the root node'
         self._virtual_dom = self._build_virtual_dom()
         self._virtual_dom.render(element)
+
+        scriptTextNode = js.globals.document.createTextNode(
+"""function cavorite_setTimeout(key, delay) { 
+    return setTimeout(function() { 
+        document.cavorite_timeouthandler(key); 
+        },
+        delay);
+    };
+""")
+        scriptElement = js.globals.document.createElement('script')
+        scriptElement.appendChild(scriptTextNode)
+        element.appendChild(scriptElement)
+        
+        scriptTextNode = js.globals.document.createTextNode(
+"""function cavorite_setInterval(key, delay) { 
+    return setInterval(function() { 
+        console.log('setInterval callback called');
+        document.cavorite_intervalhandler(key); 
+        console.log('setInterval python callback called');
+        },
+        delay);
+    };
+""")
+        scriptElement = js.globals.document.createElement('script')
+        scriptElement.appendChild(scriptTextNode)
+        element.appendChild(scriptElement)
+        
         self.mounted_element = element
 
     def _get_dom_changes(self, virtual_dom2):
@@ -208,6 +236,7 @@ class Router(object):
         if route is None:
             route = self.defaultroute
             route.url_kwargs = { }
+        route.inject_script_tags = True
         route.mount(self.dom_element)
         js.globals.document.body.onhashchange=js.Function(self.onhashchange)
 
