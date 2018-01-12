@@ -32,14 +32,4 @@ class TestTextNodeCloning(object):
         virtual_node = node._build_virtual_dom()
         assert virtual_node.original == node
         
-    def test_was_rendered_was_called(self, monkeypatch):
-        counter = {'counter': 0}
-        def dummy_callback(e):
-            counter['counter'] += 1
-        monkeypatch.setattr(cavorite.cavorite, 'js', js)
-        monkeypatch.setattr(t, 'was_rendered', dummy_callback)
-        node = t("hello")
-        virtual_node = node._build_virtual_dom()
-        virtual_node._render(None)
-        assert counter['counter'] == 1
 

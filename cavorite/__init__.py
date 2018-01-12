@@ -25,11 +25,9 @@ class TextNode(object):
 
     def _render(self, element):
         ret = js.globals.document.createTextNode(lazy_eval(self.text))
-        if self.original:
-            self.original.was_rendered()
         return ret
 
-    def was_rendered(self):
+    def was_mounted(self):
         pass
 
     def _build_virtual_dom(self):
@@ -55,6 +53,7 @@ class VNode(object):
         self.virtual_dom = None
         self.original = None
         self.inject_script_tags = False
+        self.mount_listeners = list()
         if children is not None:
             assert isinstance(attribs, dict) or attribs is None, 'attribs must be a dict attribs={} type={}'.format(attribs, type(attribs))
         if attribs is not None and children is not None:
@@ -135,25 +134,16 @@ class VNode(object):
         for child in self.get_children():
             child_element = child._render(new_element)
             new_element.appendChild(child_element)
-        if self.original:
-            self.original.was_rendered()
         return new_element
-
-    def was_rendered(self):
-        pass
 
     def _build_virtual_dom(self):
         clone = VNode(self.tag, copy.copy(self.attribs))
         clone.original = self
         for child in self.get_children():
             clone.children.append(child._build_virtual_dom())
-        return clone        
+        return clone  
 
-    def mount(self, element):
-        assert self.parent is None, 'You can only mount the root node'
-        self._virtual_dom = self._build_virtual_dom()
-        self._virtual_dom.render(element)
-
+    def attach_script_nodes(self, element):      
         scriptTextNode = js.globals.document.createTextNode(
 """function cavorite_setTimeout(key, delay) { 
     return setTimeout(function() { 
@@ -180,7 +170,18 @@ class VNode(object):
         scriptElement.appendChild(scriptTextNode)
         element.appendChild(scriptElement)
         
+    def was_mounted(self):
+        if isinstance(self.children, list):
+            for child in self.children:
+                child.was_mounted()
+
+    def mount(self, element):
+        assert self.parent is None, 'You can only mount the root node'
+        self._virtual_dom = self._build_virtual_dom()
+        self._virtual_dom.render(element)
+        self.attach_script_nodes(element)
         self.mounted_element = element
+        self.was_mounted()
 
     def _get_dom_changes(self, virtual_dom2):
         if self.tag != virtual_dom2.tag or self.attribs != virtual_dom2.attribs or \
@@ -196,6 +197,7 @@ class VNode(object):
         if any([live_vnode.parent is None for (live_vnode, new_vnode) in elements_to_change]):
             # If the root node has changed just redraw everything the rest of our logic in irrelevant
             self.render(self.mounted_element)
+            self.attach_script_nodes(self.mounted_element)
         else:
             for (live_vnode, new_vnode) in elements_to_change:
                 live_parent = live_vnode.parent
@@ -203,6 +205,7 @@ class VNode(object):
                 i = live_parent.children.index(live_vnode)
                 live_parent.children[i] = new_vnode
                 live_vnode.dom_element.replaceWith(new_vnode.dom_element)
+        self.was_mounted()
 
     def get_root(self):
         if self.parent is None:

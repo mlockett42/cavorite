@@ -5,7 +5,7 @@ import tests.fakejs as js
 from cavorite.cavorite import callbacks
 from cavorite.cavorite import timeouts
 import uuid
-
+from cavorite.cavorite.HTML import *
 
 c = cavorite.cavorite.c
 t = cavorite.cavorite.t
@@ -20,10 +20,26 @@ class TestTimeoutBehaviour(object):
     def test_script_tags_are_attached_to_body(self, monkeypatch):
         monkeypatch.setattr(cavorite.cavorite, 'js', js)
 
-        defaultroute = c('p', 'Hello world')
+        defaulttext = t('Hello world')
+        default_p = c('p', [defaulttext])
+        defaultroute = c('div', [default_p])
 
         r = Router({ }, defaultroute, js.globals.document.body)
         r.route()
+
+        scripts = [e for e in js.globals.document.body.children if e.tagName.lower() == 'script']
+
+        assert len(scripts) == 2
+
+        defaultroute.attribs = {'class': 'stuff'}
+        defaultroute.mount_redraw()
+
+        scripts = [e for e in js.globals.document.body.children if e.tagName.lower() == 'script']
+
+        assert len(scripts) == 2
+
+        defaulttext.text = 'Hello world2'
+        defaultroute.mount_redraw()
 
         scripts = [e for e in js.globals.document.body.children if e.tagName.lower() == 'script']
 
