@@ -246,4 +246,6 @@ class Router(object):
     def onhashchange(self, e):
         self.route()
             
+def get_current_hash():
+    return str(js.globals.window.location.hash)
 
