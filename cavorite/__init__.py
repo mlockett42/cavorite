@@ -143,8 +143,14 @@ class VNode(object):
             clone.children.append(child._build_virtual_dom())
         return clone  
 
-    def attach_script_nodes(self, element):      
-        scriptTextNode = js.globals.document.createTextNode(
+    def attach_script_nodes(self, element):
+        def add_script_element(script_text):
+            scriptTextNode = js.globals.document.createTextNode(script_text)
+            scriptElement = js.globals.document.createElement('script')
+            scriptElement.appendChild(scriptTextNode)
+            element.appendChild(scriptElement)
+    
+        add_script_element(
 """function cavorite_setTimeout(key, delay) { 
     return setTimeout(function() { 
         document.cavorite_timeouthandler(key); 
@@ -152,23 +158,32 @@ class VNode(object):
         delay);
     };
 """)
-        scriptElement = js.globals.document.createElement('script')
-        scriptElement.appendChild(scriptTextNode)
-        element.appendChild(scriptElement)
         
-        scriptTextNode = js.globals.document.createTextNode(
+        add_script_element(
 """function cavorite_setInterval(key, delay) { 
     return setInterval(function() { 
-        console.log('setInterval callback called');
         document.cavorite_intervalhandler(key); 
-        console.log('setInterval python callback called');
         },
         delay);
     };
 """)
-        scriptElement = js.globals.document.createElement('script')
-        scriptElement.appendChild(scriptTextNode)
-        element.appendChild(scriptElement)
+
+        add_script_element(
+"""function cavorite_ajaxGet(url, key) { 
+        var xmlhttp = new XMLHttpRequest();
+        xmlhttp.onreadystatechange = function(){
+            var parsedresult = null;
+            if (xmlhttp.readyState == XMLHttpRequest.DONE) {   // XMLHttpRequest.DONE == 4
+                if (xmlhttp.status == 200) {
+                    parsedresult = JSON.parse(xmlhttp.responseText);
+                }
+                document.cavorite_AjaxGetCallback(xmlhttp, key, parsedresult);
+            }
+        }
+        xmlhttp.open("GET", url, true);
+        xmlhttp.send();
+    }""")    
+
         
     def was_mounted(self):
         if isinstance(self.children, list):

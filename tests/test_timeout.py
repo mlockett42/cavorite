@@ -29,21 +29,21 @@ class TestTimeoutBehaviour(object):
 
         scripts = [e for e in js.globals.document.body.children if e.tagName.lower() == 'script']
 
-        assert len(scripts) == 2
+        assert len(scripts) == 3
 
         defaultroute.attribs = {'class': 'stuff'}
         defaultroute.mount_redraw()
 
         scripts = [e for e in js.globals.document.body.children if e.tagName.lower() == 'script']
 
-        assert len(scripts) == 2
+        assert len(scripts) == 3
 
         defaulttext.text = 'Hello world2'
         defaultroute.mount_redraw()
 
         scripts = [e for e in js.globals.document.body.children if e.tagName.lower() == 'script']
 
-        assert len(scripts) == 2
+        assert len(scripts) == 3
 
     def test_timeouts_are_routed_correctly(self, monkeypatch):
         def dummy_uuid():

@@ -26,7 +26,6 @@ def initialise_global_callbacks():
 
     @js.Function
     def local_onchange_handler(e):
-        print('local_onchange_handler called')
         global global_callbacks
         callbacks = global_callbacks['onchange']
         target = e.target
