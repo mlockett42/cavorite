@@ -10,7 +10,7 @@ class MockElement(object):
     def setAttribute(self, k, v):
         self.html_attribs[k] = v
     def getAttribute(self, k):
-        return self.html_attribs[k]
+        return self.html_attribs.get(k, None)
     def appendChild(self, element):
         self.children.append(element)
     def hasChildNodes(self):
@@ -26,8 +26,19 @@ def createElement(tag):
     element.tagName = tag
     return element
 
+class MockTextNode(object):
+    def __init__(self, text):
+        self._text = text
+        self.children = []
+
+    def __str__(self):
+        return self._text
+
+    def getAttribute(self, k):
+        return None
+
 def createTextNode(s):
-    return s
+    return MockTextNode(s)
 
 body = MockElement()
 
@@ -41,5 +52,10 @@ def Function(fn):
     wrapper.is_fake_js_func = True
     return wrapper
 
+
+def IterateElements(node, callback):
+    callback(node)
+    for child in node.children:
+        IterateElements(child, callback)
 
 

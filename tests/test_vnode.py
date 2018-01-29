@@ -7,6 +7,7 @@ import tests.fakejs as js
 import pytest
 import uuid
 from mock import Mock, patch
+from collections import defaultdict
 
 
 c = cavorite.cavorite.c
@@ -206,4 +207,40 @@ class TestVNodeCloning(object):
         node = c("div")
         virtual_node = node._build_virtual_dom()
         assert virtual_node.original == node
+
+class TestMockElementIteration(object):
+    def test_mockelement_iteration(self, monkeypatch):
+        monkeypatch.setattr(cavorite.cavorite, 'js', js)
+
+        d = defaultdict(int)
+
+        def mock_element_iterator_callback(node):
+            d['calls'] += 1
+            if isinstance(node, js.MockElement) and node.tagName == 'div':
+                d['div'] += 1
+            if isinstance(node, js.MockElement) and node.tagName == 'a' and node.getAttribute('href') == 'https://google.com/':
+                d['a_google'] += 1
+            if isinstance(node, js.MockElement) and node.tagName == 'p' and len(node.children) == 1:
+                child = node.children[0]
+                if isinstance(child, js.MockTextNode) and str(child) == 'Google':
+                    d['p_google'] += 1
+            if isinstance(node, js.MockTextNode) and str(node) == 'Google':
+                d['t_google'] += 1
+        
+        node = c("div", [
+                 c("a", {'href': 'https://google.com/'}, [
+                   c("p", "Google"),
+                 ]),
+               ])
+        rendered_node = node._render(None)
+        js.IterateElements(rendered_node, mock_element_iterator_callback)
+
+        # Test we are called once per node
+        assert d['calls'] == 4
+        assert d['div'] == 1
+        assert d['a_google'] == 1
+        assert d['p_google'] == 1
+        assert d['t_google'] == 1
+
+
 
