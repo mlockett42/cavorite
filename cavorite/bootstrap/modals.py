@@ -3,6 +3,8 @@ from __future__ import absolute_import, unicode_literals, print_function
 from ..HTML import *
 import copy
 from .. import get_current_hash
+import js
+
 
 class ModalTrigger(a):
     def __init__(self, attribs, children, target):
@@ -12,10 +14,17 @@ class ModalTrigger(a):
 
 
 class Modal(div):
-    def __init__(self, id, title, body):
+    def __init__(self, id, title, body, onclickhandler):
         self.id = id
         self.title = title
         self.body = body
+        def handle_ok(e):
+            if onclickhandler is not None:
+                onclickhandler(e)
+            jquery = js.globals['$']
+            jquery('#' + id).modal('hide')
+
+        self.onclickhandler = handle_ok
         super(Modal, self).__init__({'class': "modal fade", "id":id, "tabindex": "-1", "role": "dialog", "aria-labeledby": "{}Label".format(id), "aria-hidden": "true"})
 
     def get_children(self):
@@ -33,7 +42,7 @@ class Modal(div):
                       ]),
                       div({'class': 'modal-footer'}, [
                         html_button({'type': "button", 'class':"btn btn-secondary", 'data-dismiss':"modal"}, 'Cancel'),
-                        html_button({'type': "button", 'class':"btn btn-primary"}, 'OK'),
+                        html_button({'type': "button", 'class':"btn btn-primary", 'onclick': self.onclickhandler}, 'OK'),
                       ]),
                     ]),
                   ]),
