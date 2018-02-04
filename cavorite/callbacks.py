@@ -15,6 +15,7 @@ def initialise_global_callbacks():
 
     @js.Function
     def local_onclick_handler(e):
+        print('local_onclick_handler called')
         global global_callbacks
         callbacks = global_callbacks['onclick']
         target = e.target

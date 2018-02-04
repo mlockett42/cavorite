@@ -3,7 +3,10 @@ from __future__ import absolute_import, unicode_literals, print_function
 from ..HTML import *
 import copy
 from .. import get_current_hash
-import js
+try:
+    import js
+except ImportError:
+    js = None
 
 
 class ModalTrigger(a):
@@ -13,19 +16,39 @@ class ModalTrigger(a):
         super(ModalTrigger, self).__init__(attribs, children)
 
 
+
 class Modal(div):
     def __init__(self, id, title, body, onclickhandler):
         self.id = id
         self.title = title
         self.body = body
-        def handle_ok(e):
-            if onclickhandler is not None:
-                onclickhandler(e)
+        self.onclickhandler = onclickhandler
+        def handle_ok2(e):
             jquery = js.globals['$']
             jquery('#' + id).modal('hide')
-
-        self.onclickhandler = handle_ok
+        self.handle_ok2 = handle_ok2
         super(Modal, self).__init__({'class': "modal fade", "id":id, "tabindex": "-1", "role": "dialog", "aria-labeledby": "{}Label".format(id), "aria-hidden": "true"})
+
+    def handle_ok(self, e):
+
+        def IterateElements(node, callback):
+            callback(node)
+            for i in range(node.children.length):
+                child = node.children.item(i)
+                IterateElements(child, callback)
+
+        control_values = dict()
+
+        def control_values_callback(node):
+            if hasattr(node, 'tagName'):
+                if (str(node.tagName).lower() == 'input' or str(node.tagName).lower() == 'select'):
+                    control_values[str(node.getAttribute('id'))] = node.value
+
+        if self.onclickhandler is not None:
+            IterateElements(js.globals.document.getElementById(self.id), control_values_callback)
+            self.onclickhandler(e, control_values)
+        jquery = js.globals['$']
+        jquery('#' + self.id).modal('hide')
 
     def get_children(self):
         return  [
@@ -42,7 +65,7 @@ class Modal(div):
                       ]),
                       div({'class': 'modal-footer'}, [
                         html_button({'type': "button", 'class':"btn btn-secondary", 'data-dismiss':"modal"}, 'Cancel'),
-                        html_button({'type': "button", 'class':"btn btn-primary", 'onclick': self.onclickhandler}, 'OK'),
+                        html_button({'type': "button", 'class':"btn btn-primary", 'onclick': self.handle_ok}, 'OK'),
                       ]),
                     ]),
                   ]),
