@@ -34,12 +34,12 @@ class MockElement(object):
     def appendChild(self, element):
         self.children.append(element)
     def hasChildNodes(self):
-        return len(self.children) > 0
+        return len(self.children.l) > 0
     def removeChild(self, element):
         self.children.remove(element)
     @property
     def lastChild(self):
-        return self.children[-1]
+        return self.children.l[-1]
 
 def createElement(tag):
     element = MockElement()

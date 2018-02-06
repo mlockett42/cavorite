@@ -220,8 +220,8 @@ class TestMockElementIteration(object):
                 d['div'] += 1
             if isinstance(node, js.MockElement) and node.tagName == 'a' and node.getAttribute('href') == 'https://google.com/':
                 d['a_google'] += 1
-            if isinstance(node, js.MockElement) and node.tagName == 'p' and len(node.children) == 1:
-                child = node.children[0]
+            if isinstance(node, js.MockElement) and node.tagName == 'p' and len(node.children.l) == 1:
+                child = node.children.item(0)
                 if isinstance(child, js.MockTextNode) and str(child) == 'Google':
                     d['p_google'] += 1
             if isinstance(node, js.MockTextNode) and str(node) == 'Google':

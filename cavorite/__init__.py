@@ -253,11 +253,14 @@ class VNode(object):
 c = VNode
 
 class Router(object):
+    router = None
+
     def __init__(self, routes, defaultroute, dom_element):
         self.routes = routes
         self.defaultroute = defaultroute
         self.dom_element = dom_element
         js.globals.document.body.onhashchange=js.Function(self.onhashchange)
+        Router.router = self
 
     def route(self):
         url_sections = str(js.globals.window.location.href).split('#!', 1)
@@ -277,6 +280,9 @@ class Router(object):
             route.url_kwargs = { }
         route.inject_script_tags = True
         route.mount(self.dom_element)
+        self.ResetHashChange()
+
+    def ResetHashChange(self):
         js.globals.document.body.onhashchange=js.Function(self.onhashchange)
 
     def onhashchange(self, e):
