@@ -208,7 +208,7 @@ class VNode(object):
         
     def was_mounted(self):
         if isinstance(self.children, list):
-            for child in self.children:
+            for child in self.get_children():
                 child.was_mounted()
 
     def mount(self, element):
