@@ -18,10 +18,8 @@ Modal = cavorite.cavorite.bootstrap.modals.Modal
 
 class TestModals(object):
     def test_we_correctly_retreive_form_data(self, monkeypatch):
-        #rendered_modal = 1
         monkeypatch.setattr(cavorite.cavorite, 'js', js)
         monkeypatch.setattr(cavorite.cavorite.bootstrap.modals, 'js', js)
-        #monkeypatch.setattr(cavorite.cavorite.bootstrap.modals.js, 'getElementById', Mock(return_value=rendered_modal))
         onclick = Mock()
 
         m =   Modal("createNew", "Create New", [
@@ -40,8 +38,6 @@ class TestModals(object):
                   ]),
                 ]),
               ], onclick)
-
-        #print('TestModals getElementById=', js.getElementById('a'))
 
         rendered_modal = m._render(None)
         cavorite.cavorite.bootstrap.modals.js.return_get_element_by_id = {'createNew': rendered_modal}
