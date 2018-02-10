@@ -204,6 +204,27 @@ class VNode(object):
         xmlhttp.open("POST", url, true);
         xmlhttp.send(formdata);
     }""")    
+        add_script_element(
+"""function cavorite_ajaxPut(url, key, data) { 
+        var formdata = new FormData();    
+        var value;
+        Object.keys(data).forEach(function(key) {
+            value = data[key];
+            formdata.append(key, value);
+        });
+        var xmlhttp = new XMLHttpRequest();
+        xmlhttp.onreadystatechange = function(){
+            var parsedresult = null;
+            if (xmlhttp.readyState == XMLHttpRequest.DONE) {   // XMLHttpRequest.DONE == 4
+                if (xmlhttp.status == 200) {
+                    parsedresult = JSON.parse(xmlhttp.responseText);
+                }
+                document.cavorite_AjaxPutCallback(xmlhttp, key, parsedresult);
+            }
+        }
+        xmlhttp.open("PUT", url, true);
+        xmlhttp.send(formdata);
+    }""")    
 
         
     def was_mounted(self):

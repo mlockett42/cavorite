@@ -12,11 +12,14 @@ import uuid
 
 global_ajaxget_callbacks = None
 global_ajaxpost_callbacks = None
+global_ajaxput_callbacks = None
 
 global_cavorite_ajaxgethandler = None
 global_cavorite_ajaxposthandler = None
+global_cavorite_ajaxputhandler = None
 
 def initialise_ajaxget_callbacks():
+    # Initialise GET handlers
     global global_ajaxget_callbacks
     global_ajaxget_callbacks = dict()
 
@@ -34,6 +37,7 @@ def initialise_ajaxget_callbacks():
     global global_cavorite_ajaxgethandler
     global_cavorite_ajaxgethandler = cavorite_ajaxgethandler
 
+    # Initialise POST handlers
     global global_ajaxpost_callbacks
     global_ajaxpost_callbacks = dict()
 
@@ -51,6 +55,24 @@ def initialise_ajaxget_callbacks():
     global global_cavorite_ajaxposthandler
     global_cavorite_ajaxposthandler = cavorite_ajaxposthandler
 
+    # Initialise PUT handlers
+    global global_ajaxput_callbacks
+    global_ajaxput_callbacks = dict()
+
+    @js.Function
+    def cavorite_ajaxputhandler(xmlhttp, key, response):
+        key = str(key)
+        global global_ajaxput_callbacks
+
+        global_ajaxput_callbacks[key](xmlhttp, response)
+
+        del global_ajaxput_callbacks[key]
+
+    js.globals.document.cavorite_AjaxPutCallback = cavorite_ajaxputhandler
+
+    global global_cavorite_ajaxputhandler
+    global_cavorite_ajaxputhandler = cavorite_ajaxputhandler
+
 
 def ajaxget(url, handler_fn):
     global global_ajaxget_callbacks
@@ -67,5 +89,13 @@ def ajaxpost(url, data, handler_fn):
     global_ajaxpost_callbacks[function_id] = handler_fn
 
     val = js.globals.cavorite_ajaxPost(url, function_id, data)
+
+def ajaxput(url, data, handler_fn):
+    global global_ajaxput_callbacks
+    function_id = str(get_uuid())
+
+    global_ajaxput_callbacks[function_id] = handler_fn
+
+    val = js.globals.cavorite_ajaxPut(url, function_id, data)
 
 
