@@ -91,7 +91,7 @@ class TestAjaxPostBehaviour(object):
         assert len(ajaxget.global_ajaxpost_callbacks) == 0
 
 
-class TestAjaxPostBehaviour(object):
+class TestAjaxPutBehaviour(object):
 
     def test_put_requests_are_routed_correctly(self, monkeypatch):
         def dummy_uuid():
@@ -126,4 +126,41 @@ class TestAjaxPostBehaviour(object):
 
         assert counter['count'] == 1
         assert len(ajaxget.global_ajaxput_callbacks) == 0
+
+class TestAjaxDeleteBehaviour(object):
+
+    def test_delete_requests_are_routed_correctly(self, monkeypatch):
+        def dummy_uuid():
+            return uuid.UUID('531cb169-91f4-4102-9a0a-2cd5e9659071')
+
+        monkeypatch.setattr(cavorite.cavorite, 'js', js)
+        monkeypatch.setattr(callbacks, 'js', js)
+        monkeypatch.setattr(ajaxget, 'js', js)
+        monkeypatch.setattr(ajaxget, 'get_uuid', dummy_uuid)
+        callbacks.initialise_global_callbacks()
+        ajaxget.initialise_ajaxget_callbacks()
+
+        defaultroute = c('p', 'Hello world')
+
+        r = Router({ }, defaultroute, js.globals.document.body)
+        r.route()
+
+        counter = dict()
+        counter['count'] = 0
+        def dummy_callback(xmlhttp, response):
+            counter['count'] += 1
+            assert response == 'OK'
+
+        assert len(ajaxget.global_ajaxdelete_callbacks) == 0
+        val = ajaxget.ajaxdelete('/hello_world', dummy_callback)
+        assert set(ajaxget.global_ajaxdelete_callbacks.keys()) == {str(dummy_uuid())}
+
+        assert counter['count'] == 0
+
+        xmlhttp = Mock()
+        js.globals.document.cavorite_AjaxDeleteCallback(xmlhttp, str(dummy_uuid()), 'OK')
+
+        assert counter['count'] == 1
+        assert len(ajaxget.global_ajaxdelete_callbacks) == 0
+
 

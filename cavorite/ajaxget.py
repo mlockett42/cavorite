@@ -13,10 +13,12 @@ import uuid
 global_ajaxget_callbacks = None
 global_ajaxpost_callbacks = None
 global_ajaxput_callbacks = None
+global_ajaxdelete_callbacks = None
 
 global_cavorite_ajaxgethandler = None
 global_cavorite_ajaxposthandler = None
 global_cavorite_ajaxputhandler = None
+global_cavorite_ajaxdeletehandler = None
 
 def initialise_ajaxget_callbacks():
     # Initialise GET handlers
@@ -73,6 +75,24 @@ def initialise_ajaxget_callbacks():
     global global_cavorite_ajaxputhandler
     global_cavorite_ajaxputhandler = cavorite_ajaxputhandler
 
+    # Initialise DELETE handlers
+    global global_ajaxdelete_callbacks
+    global_ajaxdelete_callbacks = dict()
+
+    @js.Function
+    def cavorite_ajaxdeletehandler(xmlhttp, key, response):
+        key = str(key)
+        global global_ajaxdelete_callbacks
+
+        global_ajaxdelete_callbacks[key](xmlhttp, response)
+
+        del global_ajaxdelete_callbacks[key]
+
+    js.globals.document.cavorite_AjaxDeleteCallback = cavorite_ajaxdeletehandler
+
+    global global_cavorite_ajaxdeletehandler
+    global_cavorite_ajaxdeletehandler = cavorite_ajaxdeletehandler
+
 
 def ajaxget(url, handler_fn):
     global global_ajaxget_callbacks
@@ -97,5 +117,13 @@ def ajaxput(url, data, handler_fn):
     global_ajaxput_callbacks[function_id] = handler_fn
 
     val = js.globals.cavorite_ajaxPut(url, function_id, data)
+
+def ajaxdelete(url, handler_fn):
+    global global_ajaxdelete_callbacks
+    function_id = str(get_uuid())
+
+    global_ajaxdelete_callbacks[function_id] = handler_fn
+
+    val = js.globals.cavorite_ajaxDelete(url, function_id)
 
 
