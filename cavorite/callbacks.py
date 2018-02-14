@@ -18,7 +18,6 @@ def initialise_global_callbacks():
     #global_callbacks = { 'onclick': dict(), 'onchange': dict(), }
     global_callbacks = { k: dict() for k in supported_callback_names }
 
-    """
     @js.Function
     def local_onclick_handler(e):
         global global_callbacks
@@ -39,8 +38,18 @@ def initialise_global_callbacks():
         if cavorite_id in callbacks:
             callbacks[cavorite_id](e)
     global_callback_handlers['onchange'] = local_onchange_handler
-    """
 
+    @js.Function
+    def local_oncontextmenu_handler(e):
+        global global_callbacks
+        callbacks = global_callbacks['oncontextmenu']
+        target = e.target
+        cavorite_id = str(target.getAttribute('_cavorite_id'))
+        if cavorite_id in callbacks:
+            callbacks[cavorite_id](e)
+    global_callback_handlers['oncontextmenu'] = local_oncontextmenu_handler
+
+    """
     for k in global_callbacks:
         @js.Function
         def local_event_handler(e):
@@ -50,5 +59,6 @@ def initialise_global_callbacks():
             if cavorite_id in callbacks:
                 callbacks[cavorite_id](e)
         global_callback_handlers[k] = local_event_handler
+    """
 
     #print('initialise_global_callbacks global_callback_handlers=', global_callback_handlers)
