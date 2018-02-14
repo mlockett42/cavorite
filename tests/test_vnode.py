@@ -190,6 +190,7 @@ class TestCallables(object):
         global_callbacks = callbacks.global_callbacks
         assert global_callbacks == {'onclick': {rendered_node.getAttribute('_cavorite_id'): dummy_callback},
                                     'onchange': {rendered_node.getAttribute('_cavorite_id'): dummy_callback},
+                                    'oncontextmenu': {},
                                     }
 
         e = Mock(target=rendered_node)
