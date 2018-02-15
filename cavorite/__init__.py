@@ -285,6 +285,10 @@ class VNode(object):
         else:
             return self.parent.get_root()
         
+    def on_body_click(self, e):
+        # Called by the router if the body element is click. Ie a click not handled elsewhere
+        # Is passed on the current view
+        pass
 
 c = VNode
 
@@ -296,7 +300,9 @@ class Router(object):
         self.defaultroute = defaultroute
         self.dom_element = dom_element
         js.globals.document.body.onhashchange=js.Function(self.onhashchange)
+        js.globals.document.onclick=js.Function(self.on_body_click)
         Router.router = self
+        self.selected_route = None
 
     def route(self):
         url_sections = str(js.globals.window.location.href).split('#!', 1)
@@ -316,13 +322,18 @@ class Router(object):
             route.url_kwargs = { }
         route.inject_script_tags = True
         route.mount(self.dom_element)
+        self.selected_route = route
         self.ResetHashChange()
 
     def ResetHashChange(self):
         js.globals.document.body.onhashchange=js.Function(self.onhashchange)
+        js.globals.document.onclick=js.Function(self.on_body_click)
 
     def onhashchange(self, e):
         self.route()
+
+    def on_body_click(self, e):
+        self.selected_route.on_body_click(e)
             
 def get_current_hash():
     return str(js.globals.window.location.hash)
