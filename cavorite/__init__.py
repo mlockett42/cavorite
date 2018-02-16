@@ -119,9 +119,12 @@ class VNode(object):
             node.parent = self
             ret.append(node)
         return ret
+
+    def _createDOMElement(self, tag):
+        return js.globals.document.createElement(tag)
         
     def _render(self, element):
-        new_element = js.globals.document.createElement(self.tag)
+        new_element = self._createDOMElement(self.tag)
         self.dom_element = new_element
         for k, v in self.get_attribs().items():
             if k in callbacks.global_callback_handlers:

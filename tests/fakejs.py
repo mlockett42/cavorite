@@ -41,10 +41,20 @@ class MockElement(object):
     def lastChild(self):
         return self.children.l[-1]
 
+class MockElementSVG(MockElement):
+    pass
+
 def createElement(tag):
     element = MockElement()
     element.tagName = tag
     return element
+
+def createElementNS(ns, tag):
+    if ns == 'http://www.w3.org/2000/svg':
+        element = MockElementSVG()
+        element.tagName = tag
+        return element
+    assert False
 
 class MockTextNode(object):
     def __init__(self, text):
@@ -67,7 +77,11 @@ def getElementById(id):
 
 body = MockElement()
 
-document = Mock(createElement=createElement, createTextNode=createTextNode, getElementById=getElementById, body=body)
+document = Mock(createElement=createElement, 
+                createElementNS=createElementNS, 
+                createTextNode=createTextNode, 
+                getElementById=getElementById,
+                body=body)
 
 globals = MagicMock(document=document)
 
