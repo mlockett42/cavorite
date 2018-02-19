@@ -7,9 +7,12 @@ except ImportError:
 
 global_callbacks = None
 
-supported_callback_names = {'onclick', 'onchange', 'oncontextmenu'}
+supported_callback_names = {'onclick', 'onchange', 'oncontextmenu', 
+                            'ondblclick', 'onmousedown', 'onmouseenter',
+                            'onmouseleave', 'onmousemove', 'onmouseover',
+                            'onmouseup'
+                            }
 
-#global_callback_handlers = {'onclick': None, 'onchange': None}
 global_callback_handlers = { k: None for k in supported_callback_names }
 
 def initialise_global_callbacks():
@@ -49,16 +52,73 @@ def initialise_global_callbacks():
             callbacks[cavorite_id](e)
     global_callback_handlers['oncontextmenu'] = local_oncontextmenu_handler
 
-    """
-    for k in global_callbacks:
-        @js.Function
-        def local_event_handler(e):
-            callbacks = global_callbacks[k]
-            target = e.target
-            cavorite_id = str(target.getAttribute('_cavorite_id'))
-            if cavorite_id in callbacks:
-                callbacks[cavorite_id](e)
-        global_callback_handlers[k] = local_event_handler
-    """
+    @js.Function
+    def local_ondblclick_handler(e):
+        global global_callbacks
+        callbacks = global_callbacks['ondblclick']
+        target = e.target
+        cavorite_id = str(target.getAttribute('_cavorite_id'))
+        if cavorite_id in callbacks:
+            callbacks[cavorite_id](e)
+    global_callback_handlers['ondblclick'] = local_ondblclick_handler
 
-    #print('initialise_global_callbacks global_callback_handlers=', global_callback_handlers)
+    @js.Function
+    def local_onmousedown_handler(e):
+        global global_callbacks
+        callbacks = global_callbacks['onmousedown']
+        target = e.target
+        cavorite_id = str(target.getAttribute('_cavorite_id'))
+        if cavorite_id in callbacks:
+            callbacks[cavorite_id](e)
+    global_callback_handlers['onmousedown'] = local_onmousedown_handler
+
+    @js.Function
+    def local_onmouseenter_handler(e):
+        global global_callbacks
+        callbacks = global_callbacks['onmouseenter']
+        target = e.target
+        cavorite_id = str(target.getAttribute('_cavorite_id'))
+        if cavorite_id in callbacks:
+            callbacks[cavorite_id](e)
+    global_callback_handlers['onmouseenter'] = local_onmouseenter_handler
+
+    @js.Function
+    def local_onmouseleave_handler(e):
+        global global_callbacks
+        callbacks = global_callbacks['onmouseleave']
+        target = e.target
+        cavorite_id = str(target.getAttribute('_cavorite_id'))
+        if cavorite_id in callbacks:
+            callbacks[cavorite_id](e)
+    global_callback_handlers['onmouseleave'] = local_onmouseleave_handler
+
+    @js.Function
+    def local_onmousemove_handler(e):
+        global global_callbacks
+        callbacks = global_callbacks['onmousemove']
+        target = e.target
+        cavorite_id = str(target.getAttribute('_cavorite_id'))
+        if cavorite_id in callbacks:
+            callbacks[cavorite_id](e)
+    global_callback_handlers['onmousemove'] = local_onmousemove_handler
+
+    @js.Function
+    def local_onmouseover_handler(e):
+        global global_callbacks
+        callbacks = global_callbacks['onmouseover']
+        target = e.target
+        cavorite_id = str(target.getAttribute('_cavorite_id'))
+        if cavorite_id in callbacks:
+            callbacks[cavorite_id](e)
+    global_callback_handlers['onmouseover'] = local_onmouseover_handler
+
+    @js.Function
+    def local_onmouseup_handler(e):
+        global global_callbacks
+        callbacks = global_callbacks['onmouseup']
+        target = e.target
+        cavorite_id = str(target.getAttribute('_cavorite_id'))
+        if cavorite_id in callbacks:
+            callbacks[cavorite_id](e)
+    global_callback_handlers['onmouseup'] = local_onmouseup_handler
+

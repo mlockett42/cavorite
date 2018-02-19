@@ -293,6 +293,11 @@ class VNode(object):
         # Is passed on the current view
         pass
 
+    def on_body_mousemove(self, e, change_x, change_y):
+        # Called by the router whenever the mouse moves, change_x and change_y are the change since
+        # the last move
+        pass
+
 c = VNode
 
 class Router(object):
@@ -306,6 +311,18 @@ class Router(object):
         js.globals.document.onclick=js.Function(self.on_body_click)
         Router.router = self
         self.selected_route = None
+
+        @js.Function
+        def on_body_mousemove(e):
+            #pass
+            #print('Global on_body_mousemove called e=', e.clientX, ',', e.clientY)
+            if Router.router:
+                Router.router.on_body_mousemove(e)
+
+        js.globals.document.onmousemove = on_body_mousemove
+        self.on_body_mousemove_js_function = on_body_mousemove
+        self.global_mouse_x = 0
+        self.global_mouse_y = 0
 
     def route(self):
         url_sections = str(js.globals.window.location.href).split('#!', 1)
@@ -331,13 +348,21 @@ class Router(object):
     def ResetHashChange(self):
         js.globals.document.body.onhashchange=js.Function(self.onhashchange)
         js.globals.document.onclick=js.Function(self.on_body_click)
+        js.globals.document.onmousemove = self.on_body_mousemove_js_function
 
     def onhashchange(self, e):
         self.route()
 
     def on_body_click(self, e):
         self.selected_route.on_body_click(e)
+
+    def on_body_mousemove(self, e):
+        #print('Router.on_body_mousemove called')
+        self.selected_route.on_body_mousemove(e, e.clientX - self.global_mouse_x, e.clientY - self.global_mouse_y)
+        self.global_mouse_x = e.clientX
+        self.global_mouse_y = e.clientY
             
 def get_current_hash():
     return str(js.globals.window.location.hash)
+
 

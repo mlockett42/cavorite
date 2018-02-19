@@ -170,12 +170,36 @@ class TestCallables(object):
         def dummy_callback():
             pass
         node = c("div", {'onclick': dummy_callback,
-                         'onchange': dummy_callback})
+                         'onchange': dummy_callback,
+                         'oncontextmenu': dummy_callback,
+                         'ondblclick': dummy_callback,
+                         'onmousedown': dummy_callback,
+                         'onmouseenter': dummy_callback,
+                         'onmouseleave': dummy_callback,
+                         'onmousemove': dummy_callback,
+                         'onmouseover': dummy_callback,
+                         'onmouseup': dummy_callback})
         rendered_node = node._render(None)
         assert rendered_node.onclick.is_fake_js_func, 'Check is a function wrapped by js.Function'
         assert rendered_node.onclick != dummy_callback, 'We need to actually wrap that function'
         assert rendered_node.onchange.is_fake_js_func, 'Check is a function wrapped by js.Function'
         assert rendered_node.onchange != dummy_callback, 'We need to actually wrap that function'
+        assert rendered_node.oncontextmenu.is_fake_js_func, 'Check is a function wrapped by js.Function'
+        assert rendered_node.oncontextmenu != dummy_callback, 'We need to actually wrap that function'
+        assert rendered_node.ondblclick.is_fake_js_func, 'Check is a function wrapped by js.Function'
+        assert rendered_node.ondblclick != dummy_callback, 'We need to actually wrap that function'
+        assert rendered_node.onmousedown.is_fake_js_func, 'Check is a function wrapped by js.Function'
+        assert rendered_node.onmousedown != dummy_callback, 'We need to actually wrap that function'
+        assert rendered_node.onmouseenter.is_fake_js_func, 'Check is a function wrapped by js.Function'
+        assert rendered_node.onmouseenter != dummy_callback, 'We need to actually wrap that function'
+        assert rendered_node.onmouseleave.is_fake_js_func, 'Check is a function wrapped by js.Function'
+        assert rendered_node.onmouseleave != dummy_callback, 'We need to actually wrap that function'
+        assert rendered_node.onmousemove.is_fake_js_func, 'Check is a function wrapped by js.Function'
+        assert rendered_node.onmousemove != dummy_callback, 'We need to actually wrap that function'
+        assert rendered_node.onmouseover.is_fake_js_func, 'Check is a function wrapped by js.Function'
+        assert rendered_node.onmouseover != dummy_callback, 'We need to actually wrap that function'
+        assert rendered_node.onmouseup.is_fake_js_func, 'Check is a function wrapped by js.Function'
+        assert rendered_node.onmouseup != dummy_callback, 'We need to actually wrap that function'
         
     def test_click_routing(self, monkeypatch):
         monkeypatch.setattr(cavorite.cavorite, 'js', js)
@@ -185,12 +209,27 @@ class TestCallables(object):
         def dummy_callback(e):
             counter['counter'] += 1
         node = c("div", {'onclick': dummy_callback,
-                         'onchange': dummy_callback})
+                         'onchange': dummy_callback,
+                         'oncontextmenu': dummy_callback,
+                         'ondblclick': dummy_callback,
+                         'onmousedown': dummy_callback,
+                         'onmouseenter': dummy_callback,
+                         'onmouseleave': dummy_callback,
+                         'onmousemove': dummy_callback,
+                         'onmouseover': dummy_callback,
+                         'onmouseup': dummy_callback})
         rendered_node = node._render(None)
         global_callbacks = callbacks.global_callbacks
         assert global_callbacks == {'onclick': {rendered_node.getAttribute('_cavorite_id'): dummy_callback},
                                     'onchange': {rendered_node.getAttribute('_cavorite_id'): dummy_callback},
-                                    'oncontextmenu': {},
+                                    'oncontextmenu': {rendered_node.getAttribute('_cavorite_id'): dummy_callback},
+                                    'ondblclick': {rendered_node.getAttribute('_cavorite_id'): dummy_callback},
+                                    'onmousedown': {rendered_node.getAttribute('_cavorite_id'): dummy_callback},
+                                    'onmouseenter': {rendered_node.getAttribute('_cavorite_id'): dummy_callback},
+                                    'onmouseleave': {rendered_node.getAttribute('_cavorite_id'): dummy_callback},
+                                    'onmousemove': {rendered_node.getAttribute('_cavorite_id'): dummy_callback},
+                                    'onmouseover': {rendered_node.getAttribute('_cavorite_id'): dummy_callback},
+                                    'onmouseup': {rendered_node.getAttribute('_cavorite_id'): dummy_callback},
                                     }
 
         e = Mock(target=rendered_node)
@@ -198,6 +237,22 @@ class TestCallables(object):
         assert counter['counter'] == 1
         rendered_node.onchange(e)
         assert counter['counter'] == 2
+        rendered_node.oncontextmenu(e)
+        assert counter['counter'] == 3
+        rendered_node.ondblclick(e)
+        assert counter['counter'] == 4
+        rendered_node.onmousedown(e)
+        assert counter['counter'] == 5
+        rendered_node.onmouseenter(e)
+        assert counter['counter'] == 6
+        rendered_node.onmouseleave(e)
+        assert counter['counter'] == 7
+        rendered_node.onmousemove(e)
+        assert counter['counter'] == 8
+        rendered_node.onmouseover(e)
+        assert counter['counter'] == 9
+        rendered_node.onmouseup(e)
+        assert counter['counter'] == 10
 
 class TestVNodeCloning(object):
     def test_default_original_none(self):
