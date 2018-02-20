@@ -365,4 +365,7 @@ class Router(object):
 def get_current_hash():
     return str(js.globals.window.location.hash)
 
+def get_uuid():
+    return uuid.uuid4()
+
 

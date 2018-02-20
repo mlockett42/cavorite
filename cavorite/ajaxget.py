@@ -4,17 +4,13 @@ try:
     import js
 except ImportError:
     js = None
-
-def get_uuid():
-    return uuid.uuid4()
-
+from . import get_uuid
 import uuid
 
 global_ajaxget_callbacks = None
 global_ajaxpost_callbacks = None
 global_ajaxput_callbacks = None
 global_ajaxdelete_callbacks = None
-
 global_cavorite_ajaxgethandler = None
 global_cavorite_ajaxposthandler = None
 global_cavorite_ajaxputhandler = None

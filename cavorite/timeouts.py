@@ -4,7 +4,7 @@ try:
     import js
 except ImportError:
     js = None
-
+from . import get_uuid
 import uuid
 
 global_timeout_callbacks = None
@@ -81,10 +81,6 @@ def set_timeout(handler_fn, delay):
     global_timeout_id_to_val[function_id] = val
 
     return val
-
-
-def get_uuid():
-    return uuid.uuid4()
 
 def clear_timeout(val):
     global global_timeout_val_to_id
