@@ -237,7 +237,7 @@ class VNode(object):
                 if (xmlhttp.status == 200) {
                     parsedresult = JSON.parse(xmlhttp.responseText);
                 }
-                document.cavorite_AjaxPutCallback(xmlhttp, key, parsedresult);
+                document.cavorite_AjaxDeleteCallback(xmlhttp, key, parsedresult);
             }
         }
         xmlhttp.open("DELETE", url, true);
