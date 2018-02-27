@@ -357,7 +357,6 @@ class Router(object):
         self.selected_route.on_body_click(e)
 
     def on_body_mousemove(self, e):
-        #print('Router.on_body_mousemove called')
         self.selected_route.on_body_mousemove(e, e.clientX - self.global_mouse_x, e.clientY - self.global_mouse_y)
         self.global_mouse_x = e.clientX
         self.global_mouse_y = e.clientY

@@ -27,6 +27,7 @@ class MockElement(object):
         self.children =  MockJSList()
         self.tagName = None
         self.value = None
+        self.checked = None
     def setAttribute(self, k, v):
         self.html_attribs[k] = v
     def getAttribute(self, k):

@@ -30,7 +30,6 @@ class Modal(div):
         super(Modal, self).__init__({'class': "modal fade", "id":id, "tabindex": "-1", "role": "dialog", "aria-labeledby": "{}Label".format(id), "aria-hidden": "true"})
 
     def handle_ok(self, e):
-
         def IterateElements(node, callback):
             callback(node)
             for i in range(node.children.length):
@@ -42,7 +41,10 @@ class Modal(div):
         def control_values_callback(node):
             if hasattr(node, 'tagName'):
                 if (str(node.tagName).lower() == 'input' or str(node.tagName).lower() == 'select'):
-                    control_values[str(node.getAttribute('id'))] = node.value
+                    if node.getAttribute('type') == 'checkbox':
+                        control_values[str(node.getAttribute('id'))] = node.checked
+                    else:
+                        control_values[str(node.getAttribute('id'))] = node.value
 
         if self.onclickhandler is not None:
             IterateElements(js.globals.document.getElementById(self.id), control_values_callback)
