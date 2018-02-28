@@ -314,8 +314,6 @@ class Router(object):
 
         @js.Function
         def on_body_mousemove(e):
-            #pass
-            #print('Global on_body_mousemove called e=', e.clientX, ',', e.clientY)
             if Router.router:
                 Router.router.on_body_mousemove(e)
 
