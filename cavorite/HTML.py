@@ -14,7 +14,7 @@ htmltagnames = {'a', 'abbr', 'acronym', 'address', 'applet', 'area', 'article',
                 'aside', 'audio', 'b', 'base', 'basefont', 'bdi', 'bdo', 'big',
                 'blockquote', 'body', 'br', 'canvas', 'caption',
                 'center', 'cite', 'code', 'col', 'colgroup', 'datalist', 'dd',
-                'del', 'details', 'dfn', 'dialog', 'dir', 'div', 'dl', 'dt',
+                'del', 'details', 'dfn', 'dialog', 'div', 'dl', 'dt',
                 'em', 'embed', 'fieldset', 'figcaption', 'figure', 'font', 
                 'footer', 'form', 'frame', 'frameset', 'h1', 'h2', 'h3', 'h4',
                 'h5', 'h6', 'head', 'header', 'hr', 'html', 'i', 'iframe', 
@@ -35,3 +35,4 @@ for tagname in htmltagnames:
 html_button = ClassFactory('button', c)
 html_input = ClassFactory('input', c)
 html_object = ClassFactory('object', c)
+html_dir = ClassFactory('dir', c)
