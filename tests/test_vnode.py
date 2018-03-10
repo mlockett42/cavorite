@@ -350,3 +350,39 @@ class TestDiffingElements(object):
         
         assert len(list(node._virtual_dom._get_dom_changes(virtual_dom2))) == 1
 
+    def test_was_mounted_only_called_on_vnode_which_have_changed(self):
+        # Don't report that the DOM changed if the cavorite ID is the only thing that changed
+
+        theclass = 'Red'
+        
+        class GoogleLink(a):
+            def __init__(self):
+                super(GoogleLink, self).__init__(None, None)
+                self.was_mounted = Mock()
+
+            def get_children(self):
+                return [
+                   c("p", "Google"),
+                 ]
+
+            def get_attribs(self):
+                attribs = {'href': 'https://google.com/', 'class': theclass}
+
+        node = c("div", [
+                 GoogleLink(),
+               ])
+
+        node.was_mounted = Mock()
+
+        node._virtual_dom = node._build_virtual_dom()
+
+        theclass = 'Blue'
+
+        # Because we the class comes from out of scope variable theclass the node should redraw
+        virtual_dom2 = node._build_virtual_dom()
+        
+        #assert len(list(node._virtual_dom._get_dom_changes(virtual_dom2))) == 1
+        assert node.was_mounted.call_count == 0
+        assert node.children[0].was_mounted.call_count == 1
+
+
