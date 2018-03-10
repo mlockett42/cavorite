@@ -8,7 +8,7 @@ import pytest
 import uuid
 from mock import Mock, patch
 from collections import defaultdict
-
+from cavorite.cavorite.HTML import *
 
 c = cavorite.cavorite.c
 t = cavorite.cavorite.t
@@ -299,4 +299,54 @@ class TestMockElementIteration(object):
         assert d['t_google'] == 1
 
 
+class TestDiffingElements(object):
+    def test_cavorite_id_changes_dont_cause_redraws(self):
+        # Don't report that the DOM changed if the cavorite ID is the only thing that changed
+        
+        class GoogleLink(a):
+            def __init__(self):
+                super(GoogleLink, self).__init__({'href': 'https://google.com/'}, None)
+
+            def get_children(self):
+                return [
+                   c("p", "Google"),
+                 ]
+
+        node = c("div", [
+                 GoogleLink(),
+               ])
+
+        node._virtual_dom = node._build_virtual_dom()
+
+        # Because we create a new p element in the GoogleLink's get_children function It's _cavorite_id will change
+        virtual_dom2 = node._build_virtual_dom()
+        
+        assert len(list(node._virtual_dom._get_dom_changes(virtual_dom2))) == 0
+
+    def test_other_node_changes_do_cause_redraws(self):
+        # Don't report that the DOM changed if the cavorite ID is the only thing that changed
+
+        theclass = 'Red'
+        
+        class GoogleLink(a):
+            def __init__(self):
+                super(GoogleLink, self).__init__({'href': 'https://google.com/'}, None)
+
+            def get_children(self):
+                return [
+                   c("p", {'class': theclass}, "Google"),
+                 ]
+
+        node = c("div", [
+                 GoogleLink(),
+               ])
+
+        node._virtual_dom = node._build_virtual_dom()
+
+        theclass = 'Blue'
+
+        # Because we the class comes from out of scope variable theclass the node should redraw
+        virtual_dom2 = node._build_virtual_dom()
+        
+        assert len(list(node._virtual_dom._get_dom_changes(virtual_dom2))) == 1
 

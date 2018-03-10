@@ -259,12 +259,15 @@ class VNode(object):
         self.was_mounted()
 
     def _get_dom_changes(self, virtual_dom2):
-        if self.tag != virtual_dom2.tag or self.attribs != virtual_dom2.attribs or \
+        attribs1 = copy.copy(self.attribs)
+        del attribs1['_cavorite_id']
+        attribs2 = copy.copy(virtual_dom2.attribs)
+        del attribs2['_cavorite_id']
+        if self.tag != virtual_dom2.tag or attribs1 != attribs2 or \
             len(self.children) != len(virtual_dom2.children):
                 return [(self, virtual_dom2)]
         r = [self.children[i]._get_dom_changes(virtual_dom2.children[i]) for i in range(len(self.children))]
         return itertools.chain.from_iterable(r)
-
 
     def mount_redraw(self):
         virtual_dom2 = self._build_virtual_dom()
