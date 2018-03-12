@@ -84,7 +84,9 @@ document = Mock(createElement=createElement,
                 getElementById=getElementById,
                 body=body)
 
-globals = MagicMock(document=document)
+window = Mock()
+
+globals = MagicMock(document=document, window=window)
 
 def Function(fn):
     def wrapper(*args, **kwargs):
