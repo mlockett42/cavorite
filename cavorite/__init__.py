@@ -303,25 +303,48 @@ class VNode(object):
 
 c = VNode
 
+global_router_on_body_mousemove = None
+global_router_on_hash_change = None
+global_router_on_body_click = None
+
+def initialise_global_router_callbacks():
+
+    @js.Function
+    def router_on_body_mousemove(e):
+        if Router.router:
+            Router.router.on_body_mousemove(e)
+    global global_router_on_body_mousemove
+    global_router_on_body_mousemove = router_on_body_mousemove
+
+    @js.Function
+    def router_on_hash_change(e):
+        if Router.router:
+            Router.router.onhashchange(e)
+    global global_router_on_hash_change
+    global_router_on_hash_change = router_on_hash_change
+
+    @js.Function
+    def router_on_body_click(e):
+        if Router.router:
+            Router.router.on_body_click(e)
+    global global_router_on_body_click
+    global_router_on_body_click = router_on_body_click
+
 class Router(object):
     router = None
 
     def __init__(self, routes, defaultroute, dom_element):
+        initialise_global_router_callbacks()
         self.routes = routes
         self.defaultroute = defaultroute
         self.dom_element = dom_element
-        js.globals.document.body.onhashchange=js.Function(self.onhashchange)
-        js.globals.document.onclick=js.Function(self.on_body_click)
+        js.globals.document.body.onhashchange=global_router_on_hash_change
+        js.globals.document.onclick=global_router_on_body_click
         Router.router = self
         self.selected_route = None
 
-        @js.Function
-        def on_body_mousemove(e):
-            if Router.router:
-                Router.router.on_body_mousemove(e)
-
-        js.globals.document.onmousemove = on_body_mousemove
-        self.on_body_mousemove_js_function = on_body_mousemove
+        js.globals.document.onmousemove = global_router_on_body_mousemove
+        self.on_body_mousemove_js_function = global_router_on_body_mousemove
         self.global_mouse_x = 0
         self.global_mouse_y = 0
 
