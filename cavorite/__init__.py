@@ -59,7 +59,7 @@ class VNode(object):
         # We allow unusual combinations of passed parameters. For the purposes of clarity
         # This code unpacks them
         if children is not None:
-            assert isinstance(attribs, dict) or attribs is None,
+            assert isinstance(attribs, dict) or attribs is None, \
                 'attribs must be a dict attribs={} type={}'.format(attribs, type(attribs))
         if attribs is not None and children is not None:
             self.attribs = attribs
