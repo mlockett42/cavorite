@@ -8,6 +8,7 @@ except ImportError:
 
 
 class SVGNode(c):
+    # SVG nodes need to refer to the relavant namespace
     def _createDOMElement(self, tag):
         return js.globals.document.createElementNS('http://www.w3.org/2000/svg', tag)
 

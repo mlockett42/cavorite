@@ -2,6 +2,7 @@
 from __future__ import absolute_import, unicode_literals, print_function
 from . import c
 
+# This file dynamically creates VNode subclasses for each known HTML tag
 
 # Dynamically create classes from https://stackoverflow.com/a/15247892
 def ClassFactory(name, BaseClass):
@@ -29,9 +30,12 @@ htmltagnames = {'a', 'abbr', 'acronym', 'address', 'applet', 'area', 'article',
                 'track', 'tt', 'u', 'ul', 'var', 'video', 'wbr'
                 }
 
+# Dynamically insert variables into the global namespace
 for tagname in htmltagnames:
     globals()[tagname] = ClassFactory(tagname, c)
 
+# These need to be given different names because they conflict with standard
+# python names
 html_button = ClassFactory('button', c)
 html_input = ClassFactory('input', c)
 html_object = ClassFactory('object', c)

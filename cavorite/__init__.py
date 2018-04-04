@@ -19,27 +19,29 @@ def lazy_eval(v):
 
 
 class TextNode(object):
+    # When rendered this adds a textnode to the DOM
     def __init__(self, text):
         self.text = text
         self.original = None
 
     def _render(self, element):
-        ret = js.globals.document.createTextNode(lazy_eval(self.text))
-        return ret
+        return js.globals.document.createTextNode(lazy_eval(self.text))
 
     def was_mounted(self):
         pass
 
     def _build_virtual_dom(self):
-        ret = TextNode(lazy_eval(self.text))
-        ret.original = self
-        return ret
+        vnode = TextNode(lazy_eval(self.text))
+        vnode.original = self
+        return vnode
 
     def _get_dom_changes(self, virtual_dom2):
+        # Determine if the DOMs are different if yes return this one
         if self.text != virtual_dom2.text:
             return [(self, virtual_dom2)]
         else:
             return []
+
 
 t = TextNode
 
@@ -54,8 +56,11 @@ class VNode(object):
         self.original = None
         self.inject_script_tags = False
         self.mount_listeners = list()
+        # We allow unusual combinations of passed parameters. For the purposes of clarity
+        # This code unpacks them
         if children is not None:
-            assert isinstance(attribs, dict) or attribs is None, 'attribs must be a dict attribs={} type={}'.format(attribs, type(attribs))
+            assert isinstance(attribs, dict) or attribs is None,
+                'attribs must be a dict attribs={} type={}'.format(attribs, type(attribs))
         if attribs is not None and children is not None:
             self.attribs = attribs
             if isinstance(children, list) or callable(children):
@@ -98,8 +103,8 @@ class VNode(object):
         if '_cavorite_id' not in self.attribs:
             self.attribs['_cavorite_id'] = uuid.uuid4().hex
 
-
     def render(self, element):
+        # Create a new DOM element and replace the passed element with it
         while element.hasChildNodes():
             element.removeChild(element.lastChild)
         new_element = self._render(element)
@@ -109,10 +114,13 @@ class VNode(object):
         return self.attribs
 
     def get_children(self):
+        # The child vnodes of this vnode. Note we allow the children parameter
+        # passed to the constructor to be a function
         if callable(self.children):
             children = self.children()
         else:
             children = self.children
+        # Each child can itself be a function call each one in turn
         ret = []
         for child in children:
             node = child() if callable(child) else child
@@ -124,6 +132,7 @@ class VNode(object):
         return js.globals.document.createElement(tag)
         
     def _render(self, element):
+        # Output this nvnode and its children to the DOM
         new_element = self._createDOMElement(self.tag)
         self.dom_element = new_element
         for k, v in self.get_attribs().items():
@@ -140,6 +149,7 @@ class VNode(object):
         return new_element
 
     def _build_virtual_dom(self):
+        # Build a copy of the Virtual DOM but render each tag as it's based HTML tag
         clone = VNode(self.tag, copy.copy(self.attribs))
         clone.original = self
         for child in self.get_children():
@@ -147,6 +157,7 @@ class VNode(object):
         return clone  
 
     def attach_script_nodes(self, element):
+        # Script nodes are helper objects for callbacks they need to be inserted manually
         def add_script_element(script_text):
             scriptTextNode = js.globals.document.createTextNode(script_text)
             scriptElement = js.globals.document.createElement('script')
@@ -251,6 +262,7 @@ class VNode(object):
                 child.was_mounted()
 
     def mount(self, element):
+        # Output the DOM into the passed element
         assert self.parent is None, 'You can only mount the root node'
         self._virtual_dom = self._build_virtual_dom()
         self._virtual_dom.render(element)
@@ -259,6 +271,8 @@ class VNode(object):
         self.was_mounted()
 
     def _get_dom_changes(self, virtual_dom2):
+        # Compare the rendered current DOM to a virtual DOM copy. This is how we
+        # ddetermine what has change and what needs to be re-rendered
         attribs1 = copy.copy(self.attribs)
         del attribs1['_cavorite_id']
         attribs2 = copy.copy(virtual_dom2.attribs)
@@ -270,6 +284,7 @@ class VNode(object):
         return itertools.chain.from_iterable(r)
 
     def mount_redraw(self):
+        # Redraw the view. This will determine which DOM elements have changed and redraw them
         virtual_dom2 = self._build_virtual_dom()
         elements_to_change = list(self._virtual_dom._get_dom_changes(virtual_dom2))
         if any([live_vnode.parent is None for (live_vnode, new_vnode) in elements_to_change]):
@@ -301,7 +316,9 @@ class VNode(object):
         # the last move
         pass
 
+
 c = VNode
+
 
 global_router_on_body_mousemove = None
 global_router_on_hash_change = None
@@ -330,7 +347,12 @@ def initialise_global_router_callbacks():
     global global_router_on_body_click
     global_router_on_body_click = router_on_body_click
 
+
 class Router(object):
+    # A router handles if we want a SPA. All this means is that a different view is selected into 
+    # the body depending on the hash bang path
+
+    # There is only one router so we make it a global for convenience
     router = None
 
     def __init__(self, routes, defaultroute, dom_element):
@@ -349,6 +371,8 @@ class Router(object):
         self.global_mouse_y = 0
 
     def route(self):
+        # Route inspects the URL and mounts the correct view into the desired DOM
+        # element
         url_sections = str(js.globals.window.location.href).split('#!', 1)
         if len(url_sections) == 2:
             url = url_sections[1]
@@ -370,6 +394,7 @@ class Router(object):
         self.ResetHashChange()
 
     def ResetHashChange(self):
+        # Bootstrap modifies the handchange handler so we manually switch it back here
         js.globals.document.body.onhashchange=js.Function(self.onhashchange)
         js.globals.document.onclick=js.Function(self.on_body_click)
         js.globals.document.onmousemove = self.on_body_mousemove_js_function
@@ -381,7 +406,8 @@ class Router(object):
         self.selected_route.on_body_click(e)
 
     def on_body_mousemove(self, e):
-        self.selected_route.on_body_mousemove(e, e.clientX - self.global_mouse_x, e.clientY - self.global_mouse_y)
+        self.selected_route.on_body_mousemove(e, e.clientX - self.global_mouse_x,
+                                              e.clientY - self.global_mouse_y)
         self.global_mouse_x = e.clientX
         self.global_mouse_y = e.clientY
             

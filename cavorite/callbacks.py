@@ -16,9 +16,9 @@ supported_callback_names = {'onclick', 'onchange', 'oncontextmenu',
 global_callback_handlers = { k: None for k in supported_callback_names }
 
 def initialise_global_callbacks():
+    # initialise callbacks for commonly used handlers
     global global_callbacks
     global supported_callback_names
-    #global_callbacks = { 'onclick': dict(), 'onchange': dict(), }
     global_callbacks = { k: dict() for k in supported_callback_names }
 
     @js.Function

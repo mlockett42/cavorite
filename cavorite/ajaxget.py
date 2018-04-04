@@ -17,7 +17,8 @@ global_cavorite_ajaxputhandler = None
 global_cavorite_ajaxdeletehandler = None
 
 def initialise_ajaxget_callbacks():
-    # Initialise GET handlers
+    # Initialise GET, POST, PUT and DELETE handlers
+    # Each handler has it's own dict of callback functions
     global global_ajaxget_callbacks
     global_ajaxget_callbacks = dict()
 
@@ -91,6 +92,8 @@ def initialise_ajaxget_callbacks():
 
 
 def ajaxget(url, handler_fn):
+    # Called be application code to execute an AJAX GET request
+    # Sets up the callback and then calls into the javascript
     global global_ajaxget_callbacks
     function_id = str(get_uuid())
 
@@ -99,6 +102,8 @@ def ajaxget(url, handler_fn):
     val = js.globals.cavorite_ajaxGet(url, function_id)
 
 def ajaxpost(url, data, handler_fn):
+    # Called be application code to execute an AJAX GET request
+    # Sets up the callback and then calls into the javascript
     global global_ajaxpost_callbacks
     function_id = str(get_uuid())
 
@@ -107,6 +112,8 @@ def ajaxpost(url, data, handler_fn):
     val = js.globals.cavorite_ajaxPost(url, function_id, data)
 
 def ajaxput(url, data, handler_fn):
+    # Called be application code to execute an AJAX GET request
+    # Sets up the callback and then calls into the javascript
     global global_ajaxput_callbacks
     function_id = str(get_uuid())
 
@@ -115,6 +122,8 @@ def ajaxput(url, data, handler_fn):
     val = js.globals.cavorite_ajaxPut(url, function_id, data)
 
 def ajaxdelete(url, handler_fn):
+    # Called be application code to execute an AJAX GET request
+    # Sets up the callback and then calls into the javascript
     global global_ajaxdelete_callbacks
     function_id = str(get_uuid())
 
