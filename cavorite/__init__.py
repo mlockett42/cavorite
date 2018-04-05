@@ -395,8 +395,8 @@ class Router(object):
 
     def ResetHashChange(self):
         # Bootstrap modifies the handchange handler so we manually switch it back here
-        js.globals.document.body.onhashchange=js.Function(self.onhashchange)
-        js.globals.document.onclick=js.Function(self.on_body_click)
+        js.globals.document.body.onhashchange=global_router_on_hash_change
+        js.globals.document.onclick=global_router_on_body_click
         js.globals.document.onmousemove = self.on_body_mousemove_js_function
 
     def onhashchange(self, e):
