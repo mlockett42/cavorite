@@ -25,7 +25,8 @@ class TextNode(object):
         self.original = None
 
     def _render(self, element):
-        return js.globals.document.createTextNode(lazy_eval(self.text))
+        self.dom_element = js.globals.document.createTextNode(lazy_eval(self.text))
+        return self.dom_element
 
     def was_mounted(self):
         pass
@@ -398,6 +399,8 @@ class Router(object):
         js.globals.document.body.onhashchange=global_router_on_hash_change
         js.globals.document.onclick=global_router_on_body_click
         js.globals.document.onmousemove = self.on_body_mousemove_js_function
+        import gc
+        gc.collect()
 
     def onhashchange(self, e):
         self.route()
