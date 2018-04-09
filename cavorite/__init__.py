@@ -23,6 +23,7 @@ class TextNode(object):
     def __init__(self, text):
         self.text = text
         self.original = None
+        self.parent = None
 
     def _render(self, element):
         self.dom_element = js.globals.document.createTextNode(lazy_eval(self.text))
