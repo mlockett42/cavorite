@@ -372,9 +372,10 @@ class Router(object):
         self.global_mouse_x = 0
         self.global_mouse_y = 0
 
-    def route(self):
-        # Route inspects the URL and mounts the correct view into the desired DOM
-        # element
+    def get_selected_route(self):
+        # Returns the selected route and the url_kwargs as a tuple. This is
+        # becuase the route can be a callable. This function can be overridden
+        # by a subclass. If there are no url kwargs return an empty dict
         url_sections = str(js.globals.window.location.href).split('#!', 1)
         if len(url_sections) == 2:
             url = url_sections[1]
@@ -390,6 +391,12 @@ class Router(object):
         if route is None:
             route = self.defaultroute
             url_kwargs = { }
+        return route, url_kwargs
+
+    def route(self):
+        # Route inspects the URL and mounts the correct view into the desired DOM
+        # element
+        route, url_kwargs = self.get_selected_route()
         if callable(route):
             route = route()
         route.url_kwargs = url_kwargs
