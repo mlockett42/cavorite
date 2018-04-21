@@ -386,10 +386,13 @@ class Router(object):
             m = p.search(url)
             if m:
                 route = v
-                route.url_kwargs = m.groupdict()
+                url_kwargs = m.groupdict()
         if route is None:
             route = self.defaultroute
-            route.url_kwargs = { }
+            url_kwargs = { }
+        if callable(route):
+            route = route()
+        route.url_kwargs = url_kwargs
         route.inject_script_tags = True
         route.mount(self.dom_element)
         self.selected_route = route

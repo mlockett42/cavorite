@@ -3,6 +3,7 @@ from __future__ import absolute_import, unicode_literals, print_function
 import tests.fakejs as js
 import cavorite.cavorite
 from mock import Mock
+from cavorite.cavorite.HTML import *
 
 Router = cavorite.cavorite.Router
 c = cavorite.cavorite.c
@@ -101,4 +102,37 @@ class TestRouter(object):
 
         assert r.global_mouse_x == 520
         assert r.global_mouse_y == 530
+
+    def test_router_handles_routes_which_are_callables(self, monkeypatch):
+        class EditorView(div):
+            def get_children(self):
+                return [p(str(self.get_root().url_kwargs['project_id']))]
+
+        monkeypatch.setattr(cavorite.cavorite, 'js', js)
+
+        body = js.globals.document.body
+
+        js.globals.window.location.href = '#!editor/d8fb8497-fb86-4dea-bd9c-49ad883b7a84'
+
+        def editor_page():
+            return EditorView()
+
+        hello_page = c("div", [c("p", "Hello there"),
+                                 ])
+
+        error_404_page = c("div", [c("p", "No match 404 error"),
+                                   c("p", [c("a", {"href": "/#!"}, "Back to main page")])])
+
+        r = Router({r'^editor/(?P<project_id>[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})$': editor_page,
+                    },
+                    error_404_page, body)
+        r.route()
+
+        div1 = body.children.item(0)
+        assert div1.tagName == 'div'
+        assert div1.children.length == 1
+        p1 = div1.children.item(0)
+        assert p1.children.length == 1
+        assert str(p1.children.item(0)) == 'd8fb8497-fb86-4dea-bd9c-49ad883b7a84'
+
 
