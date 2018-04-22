@@ -350,12 +350,35 @@ class TestDiffingElements(object):
         
         assert len(list(node._virtual_dom._get_dom_changes(virtual_dom2))) == 1
 
-    """
-    This test commented out because currently incorrect. Mount_redraw is redrawing the entire
-    DOM in many situations to shouldn't this test is part of a failed attempt to fix this
-    Somehow this was checked in develop incorrectly
+    def test_other_number_of_children_changes_do_not_cause_redraws(self):
+        # Don't report that the DOM changed if the cavorite ID is the only thing that changed
 
-    def test_was_mounted_only_called_on_vnode_which_have_changed(self):
+        number = 1
+        
+        class TheList(ul):
+            def __init__(self):
+                super(TheList, self).__init__()
+
+            def get_children(self):
+                return [ol("Hello")] * number
+
+        node = c("div", [
+                 TheList(),
+               ])
+
+        node._virtual_dom = node._build_virtual_dom()
+
+        number = 2
+
+        # Because we the class comes from out of scope variable theclass the node should redraw
+        virtual_dom2 = node._build_virtual_dom()
+        
+        changes = list(node._virtual_dom._get_dom_changes(virtual_dom2))
+        assert len(changes) == 1
+        assert changes[0][0].tag == 'ul'
+
+    def test_was_mounted_only_called_on_vnode_which_have_changed(self, monkeypatch):
+        monkeypatch.setattr(cavorite.cavorite, 'js', js)
         # Don't report that the DOM changed if the cavorite ID is the only thing that changed
 
         theclass = 'Red'
@@ -371,7 +394,9 @@ class TestDiffingElements(object):
                  ]
 
             def get_attribs(self):
-                attribs = {'href': 'https://google.com/', 'class': theclass}
+                attribs = super(GoogleLink, self).get_attribs()
+                attribs.update({'href': 'https://google.com/', 'class': theclass})
+                return attribs
 
         node = c("div", [
                  GoogleLink(),
@@ -379,18 +404,36 @@ class TestDiffingElements(object):
 
         node.was_mounted = Mock()
 
-        node._virtual_dom = node._build_virtual_dom()
+        #node._virtual_dom = node._build_virtual_dom()
+        body = js.globals.document.body
+        node.mount(body)
+
+        div1 = node._virtual_dom
+        assert div1.__class__ == c
+        assert div1.tag == 'div'
+        assert len(div1.children) == 1
+        a1 = div1.children[0]
+        assert a1.tag == 'a'
+        assert a1.__class__ == c
+        assert a1.attribs['class'] == 'Red'
+
 
         theclass = 'Blue'
 
         # Because we the class comes from out of scope variable theclass the node should redraw
         virtual_dom2 = node._build_virtual_dom()
-        
-        #assert len(list(node._virtual_dom._get_dom_changes(virtual_dom2))) == 1
-        assert node.was_mounted.call_count == 0
-        print('test_nvode node=', node)
-        print('test_nvode type(node)=', type(node))
-        print('test_nvode node.children=', node.children)
-        assert node.children[0].was_mounted.call_count == 1
 
-        """
+        assert len(list(node._virtual_dom._get_dom_changes(virtual_dom2))) == 1
+
+        node.mount_redraw()
+
+        div1 = node._virtual_dom
+        assert div1.__class__ == c
+        assert div1.tag == 'div'
+        assert len(div1.children) == 1
+        a1 = div1.children[0]
+        assert a1.tag == 'a'
+        assert a1.__class__ == c
+        assert a1.attribs['class'] == 'Blue'
+
+

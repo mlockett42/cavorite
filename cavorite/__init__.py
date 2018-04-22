@@ -139,7 +139,7 @@ class VNode(object):
         self.dom_element = new_element
         for k, v in self.get_attribs().items():
             if k in callbacks.global_callback_handlers:
-                callbacks.global_callbacks[k][self.attribs['_cavorite_id']] = v
+                callbacks.global_callbacks[k][self.get_attribs()['_cavorite_id']] = v
                 setattr(new_element,k, callbacks.global_callback_handlers[k])
             elif callable(v):
                 new_element.setAttribute(k, v())
@@ -152,10 +152,12 @@ class VNode(object):
 
     def _build_virtual_dom(self):
         # Build a copy of the Virtual DOM but render each tag as it's based HTML tag
-        clone = VNode(self.tag, copy.copy(self.attribs))
+        clone = VNode(self.tag, copy.copy(self.get_attribs()))
         clone.original = self
         for child in self.get_children():
-            clone.children.append(child._build_virtual_dom())
+            child_clone = child._build_virtual_dom()
+            child_clone.parent = clone
+            clone.children.append(child_clone)
         return clone  
 
     def attach_script_nodes(self, element):
@@ -275,9 +277,9 @@ class VNode(object):
     def _get_dom_changes(self, virtual_dom2):
         # Compare the rendered current DOM to a virtual DOM copy. This is how we
         # ddetermine what has change and what needs to be re-rendered
-        attribs1 = copy.copy(self.attribs)
+        attribs1 = copy.copy(self.get_attribs())
         del attribs1['_cavorite_id']
-        attribs2 = copy.copy(virtual_dom2.attribs)
+        attribs2 = copy.copy(virtual_dom2.get_attribs())
         del attribs2['_cavorite_id']
         if self.tag != virtual_dom2.tag or attribs1 != attribs2 or \
             len(self.children) != len(virtual_dom2.children):

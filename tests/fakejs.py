@@ -41,6 +41,9 @@ class MockElement(object):
     @property
     def lastChild(self):
         return self.children.l[-1]
+    def replaceWith(self, new_element):
+        # Just a dummy for now
+        pass
 
 class MockElementSVG(MockElement):
     pass
