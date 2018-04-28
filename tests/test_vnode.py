@@ -106,11 +106,11 @@ class TestAttribs(object):
         node = c('div', {'class': class_callback})
 
         value = 'hello'
-        rendered_node = node._render(None)
+        rendered_node = node._render()
         assert rendered_node.getAttribute('class') == 'hello'
         
         value = 'world'
-        rendered_node = node._render(None)
+        rendered_node = node._render()
         assert rendered_node.getAttribute('class') == 'world'
 
 class TestStyle(object):
@@ -159,7 +159,7 @@ class TestNodeIDs(object):
         monkeypatch.setattr(cavorite.cavorite, 'js', js)
         node = c("div")
         assert validate_uuid4(node.attribs['_cavorite_id'])
-        rendered_node = node._render(None)
+        rendered_node = node._render()
         assert rendered_node.getAttribute('_cavorite_id') == node.attribs['_cavorite_id']
 
 class TestCallables(object):
@@ -179,7 +179,7 @@ class TestCallables(object):
                          'onmousemove': dummy_callback,
                          'onmouseover': dummy_callback,
                          'onmouseup': dummy_callback})
-        rendered_node = node._render(None)
+        rendered_node = node._render()
         assert rendered_node.onclick.is_fake_js_func, 'Check is a function wrapped by js.Function'
         assert rendered_node.onclick != dummy_callback, 'We need to actually wrap that function'
         assert rendered_node.onchange.is_fake_js_func, 'Check is a function wrapped by js.Function'
@@ -218,7 +218,7 @@ class TestCallables(object):
                          'onmousemove': dummy_callback,
                          'onmouseover': dummy_callback,
                          'onmouseup': dummy_callback})
-        rendered_node = node._render(None)
+        rendered_node = node._render()
         global_callbacks = callbacks.global_callbacks
         assert global_callbacks == {'onclick': {rendered_node.getAttribute('_cavorite_id'): dummy_callback},
                                     'onchange': {rendered_node.getAttribute('_cavorite_id'): dummy_callback},
@@ -288,7 +288,7 @@ class TestMockElementIteration(object):
                    c("p", "Google"),
                  ]),
                ])
-        rendered_node = node._render(None)
+        rendered_node = node._render()
         js.IterateElements(rendered_node, mock_element_iterator_callback)
 
         # Test we are called once per node
@@ -435,5 +435,74 @@ class TestDiffingElements(object):
         assert a1.tag == 'a'
         assert a1.__class__ == c
         assert a1.attribs['class'] == 'Blue'
+
+    def test_attrib_values_can_be_callables_which_are_lazily_evaluated(self, monkeypatch):
+        monkeypatch.setattr(cavorite.cavorite, 'js', js)
+        # Don't report that the DOM changed if the cavorite ID is the only thing that changed
+
+        theclass = 'Red'
+        
+        class GoogleLink(a):
+            def __init__(self):
+                super(GoogleLink, self).__init__(None, None)
+                self.was_mounted = Mock()
+
+            def get_children(self):
+                return [
+                   c("p", "Google"),
+                 ]
+
+            def link_onclick(self, e):
+                pass
+
+            def get_attribs(self):
+                attribs = super(GoogleLink, self).get_attribs()
+                attribs.update({'href': 'https://google.com/', 'class': lambda : theclass, 'onclick': self.link_onclick})
+                return attribs
+
+        node = c("div", [
+                 GoogleLink(),
+               ])
+
+        node.was_mounted = Mock()
+
+        google_link = node.children[0]
+        assert google_link.__class__ == GoogleLink
+        assert google_link.get_lazy_eval_attribs()['class'] == 'Red'
+        assert callable(google_link.get_lazy_eval_attribs()['onclick'])
+
+        #node._virtual_dom = node._build_virtual_dom()
+        body = js.globals.document.body
+        node.mount(body)
+
+        div1 = node._virtual_dom
+        assert div1.__class__ == c
+        assert div1.tag == 'div'
+        assert len(div1.children) == 1
+        a1 = div1.children[0]
+        assert a1.tag == 'a'
+        assert a1.__class__ == c
+        assert a1.attribs['class'] == 'Red'
+        assert callable(a1.attribs['onclick'])
+
+
+        theclass = 'Blue'
+
+        # Because we the class comes from out of scope variable theclass the node should redraw
+        virtual_dom2 = node._build_virtual_dom()
+
+        assert len(list(node._virtual_dom._get_dom_changes(virtual_dom2))) == 1
+
+        node.mount_redraw()
+
+        div1 = node._virtual_dom
+        assert div1.__class__ == c
+        assert div1.tag == 'div'
+        assert len(div1.children) == 1
+        a1 = div1.children[0]
+        assert a1.tag == 'a'
+        assert a1.__class__ == c
+        assert a1.attribs['class'] == 'Blue'
+        assert callable(a1.attribs['onclick'])
 
 

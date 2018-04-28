@@ -35,7 +35,7 @@ class TestMockElementIteration(object):
                    svg("line", {'x1': '5', 'y1': '5', 'x2': '350', 'y2': '360', 'style': "stroke:rgb(255,0,0);stroke-width:2"}),
                  ]),
                ])
-        rendered_node = node._render(None)
+        rendered_node = node._render()
         js.IterateElements(rendered_node, mock_element_iterator_callback)
 
         # Test we are called once per node
@@ -68,7 +68,7 @@ class TestMockElementIteration(object):
                    line({'x1': '5', 'y1': '5', 'x2': '350', 'y2': '360', 'style': "stroke:rgb(255,0,0);stroke-width:2"}),
                  ]),
                ])
-        rendered_node = node._render(None)
+        rendered_node = node._render()
         js.IterateElements(rendered_node, mock_element_iterator_callback)
 
         # Test we are called once per node

@@ -71,6 +71,10 @@ class MockTextNode(object):
     def getAttribute(self, k):
         return None
 
+    def replaceWith(self, new_element):
+        # Just a dummy for now
+        pass
+
 def createTextNode(s):
     return MockTextNode(s)
 

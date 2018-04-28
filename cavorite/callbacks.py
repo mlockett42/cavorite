@@ -4,6 +4,8 @@ try:
     import js
 except ImportError:
     js = None
+import sys
+import traceback
 
 global_callbacks = None
 
@@ -23,12 +25,40 @@ def initialise_global_callbacks():
 
     @js.Function
     def local_onclick_handler(e):
-        global global_callbacks
-        callbacks = global_callbacks['onclick']
-        target = e.target
-        cavorite_id = str(target.getAttribute('_cavorite_id'))
-        if cavorite_id in callbacks:
-            callbacks[cavorite_id](e)
+        #exc_info = None
+        try:
+            global global_callbacks
+            callbacks = global_callbacks['onclick']
+            target = e.target
+            cavorite_id = str(target.getAttribute('_cavorite_id'))
+            if cavorite_id in callbacks:
+                callbacks[cavorite_id](e)
+        except Exception as err:
+            print('Exception caught')
+            try:
+                print('Exception caught 1')
+                exc_info = sys.exc_info()
+                print('Exception caught 2')   
+
+                # do you usefull stuff here
+                # (potentially raising an exception)
+                try:
+                    raise TypeError("Again !?!")
+                except:
+                    pass
+                # end of useful stuff
+
+
+            finally:
+                # Display the *original* exception
+                #traceback.print_exception(*exc_info)
+                (exc_type, exc_value, exc_traceback) = exc_info
+                print('local_onclick_handler exception exc_type=',exc_type)
+                print('local_onclick_handler exception exc_value=',exc_value)
+                print('local_onclick_handler exception exc_traceback=',exc_traceback)
+                print('local_onclick_handler exception extract_tb=',traceback.extract_tb(exc_traceback))
+                #del exc_info
+
     global global_callback_handlers
     global_callback_handlers['onclick'] = local_onclick_handler
 

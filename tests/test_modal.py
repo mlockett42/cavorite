@@ -39,7 +39,7 @@ class TestModals(object):
                 ]),
               ], onclick)
 
-        rendered_modal = m._render(None)
+        rendered_modal = m._render()
         cavorite.cavorite.bootstrap.modals.js.return_get_element_by_id = {'createNew': rendered_modal}
 
         result = dict()

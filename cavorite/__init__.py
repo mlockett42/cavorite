@@ -25,7 +25,7 @@ class TextNode(object):
         self.original = None
         self.parent = None
 
-    def _render(self, element):
+    def _render(self):
         self.dom_element = js.globals.document.createTextNode(lazy_eval(self.text))
         return self.dom_element
 
@@ -46,7 +46,6 @@ class TextNode(object):
 
 
 t = TextNode
-
 
 class VNode(object):
     def __init__(self, tag, attribs=None, children=None, cssClass=None, **kwargs):
@@ -109,7 +108,7 @@ class VNode(object):
         # Create a new DOM element and replace the passed element with it
         while element.hasChildNodes():
             element.removeChild(element.lastChild)
-        new_element = self._render(element)
+        new_element = self._render()
         element.appendChild(new_element)
 
     def get_attribs(self):
@@ -133,7 +132,7 @@ class VNode(object):
     def _createDOMElement(self, tag):
         return js.globals.document.createElement(tag)
         
-    def _render(self, element):
+    def _render(self):
         # Output this nvnode and its children to the DOM
         new_element = self._createDOMElement(self.tag)
         self.dom_element = new_element
@@ -146,13 +145,20 @@ class VNode(object):
             else:
                 new_element.setAttribute(k, v)
         for child in self.get_children():
-            child_element = child._render(new_element)
+            child_element = child._render()
             new_element.appendChild(child_element)
         return new_element
 
+    def get_lazy_eval_attribs(self):
+        return { k:
+                 (v if k in callbacks.global_callback_handlers else lazy_eval(v))
+                 for k,v in self.get_attribs().items() 
+               }
+
     def _build_virtual_dom(self):
         # Build a copy of the Virtual DOM but render each tag as it's based HTML tag
-        clone = VNode(self.tag, copy.copy(self.get_attribs()))
+        attribs = self.get_lazy_eval_attribs()
+        clone = VNode(self.tag, attribs)
         clone.original = self
         for child in self.get_children():
             child_clone = child._build_virtual_dom()
@@ -275,12 +281,21 @@ class VNode(object):
         self.was_mounted()
 
     def _get_dom_changes(self, virtual_dom2):
+        def strip_nocomparision(attribs):
+            # Return attribs with values we dont wish to compare removed
+            attribs = copy.copy(attribs)
+            del attribs['_cavorite_id']
+            attribs.pop('onclick', None)
+            return attribs
+
         # Compare the rendered current DOM to a virtual DOM copy. This is how we
         # ddetermine what has change and what needs to be re-rendered
-        attribs1 = copy.copy(self.get_attribs())
-        del attribs1['_cavorite_id']
-        attribs2 = copy.copy(virtual_dom2.get_attribs())
-        del attribs2['_cavorite_id']
+        attribs1 = strip_nocomparision(self.get_attribs())
+        #del attribs1['_cavorite_id']
+        attribs2 = strip_nocomparision(virtual_dom2.get_attribs())
+        #del attribs2['_cavorite_id']
+        assert self.__class__ == c
+        assert virtual_dom2.__class__ == c
         if self.tag != virtual_dom2.tag or attribs1 != attribs2 or \
             len(self.children) != len(virtual_dom2.children):
                 return [(self, virtual_dom2)]
@@ -290,18 +305,23 @@ class VNode(object):
     def mount_redraw(self):
         # Redraw the view. This will determine which DOM elements have changed and redraw them
         virtual_dom2 = self._build_virtual_dom()
-        elements_to_change = list(self._virtual_dom._get_dom_changes(virtual_dom2))
+        elements_to_change = list(self._virtual_dom._get_dom_changes(virtual_dom2))[::-1]
         if any([live_vnode.parent is None for (live_vnode, new_vnode) in elements_to_change]):
+            print('performing full mount redraw')
             # If the root node has changed just redraw everything the rest of our logic in irrelevant
-            self.render(self.mounted_element)
+            self._virtual_dom = virtual_dom2
+            self._virtual_dom.render(self.mounted_element)
             self.attach_script_nodes(self.mounted_element)
         else:
+            print('mount_redraw elements_to_change=', elements_to_change)
             for (live_vnode, new_vnode) in elements_to_change:
                 live_parent = live_vnode.parent
-                new_element = new_vnode._render(live_parent)
                 i = live_parent.children.index(live_vnode)
+                new_vnode.dom_element = new_vnode._render()
                 live_parent.children[i] = new_vnode
+                new_vnode.parent = live_parent
                 live_vnode.dom_element.replaceWith(new_vnode.dom_element)
+                #live_vnode.parent = None
         self.was_mounted()
 
     def get_root(self):
