@@ -10,7 +10,7 @@ global_callbacks = None
 supported_callback_names = {'onclick', 'onchange', 'oncontextmenu', 
                             'ondblclick', 'onmousedown', 'onmouseenter',
                             'onmouseleave', 'onmousemove', 'onmouseover',
-                            'onmouseup'
+                            'onmouseup', 'onsubmit',
                             }
 
 global_callback_handlers = { k: None for k in supported_callback_names }
@@ -121,4 +121,14 @@ def initialise_global_callbacks():
         if cavorite_id in callbacks:
             callbacks[cavorite_id](e)
     global_callback_handlers['onmouseup'] = local_onmouseup_handler
+
+    @js.Function
+    def local_onsubmit_handler(e):
+        global global_callbacks
+        callbacks = global_callbacks['onsubmit']
+        target = e.target
+        cavorite_id = str(target.getAttribute('_cavorite_id'))
+        if cavorite_id in callbacks:
+            callbacks[cavorite_id](e)
+    global_callback_handlers['onsubmit'] = local_onsubmit_handler
 
