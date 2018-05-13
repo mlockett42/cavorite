@@ -398,3 +398,23 @@ class TestDiffingElements(object):
         assert node.children[0].was_mounted.call_count == 1
 
         """
+
+class TestTagNameIsCallable(object):
+    def test_tag_name_is_called(self, monkeypatch):
+        monkeypatch.setattr(cavorite.cavorite, 'js', js)
+        node = c("div")
+        
+        monkeypatch.setattr(node, 'get_tag_name', Mock())
+        rendered_node = node._render(None)
+        assert node.get_tag_name.call_count == 1
+
+    def test_tag_name_returns_correct_result(self, monkeypatch):
+        monkeypatch.setattr(cavorite.cavorite, 'js', js)
+        node = c("div")
+        assert node.get_tag_name() == 'div'
+
+    def test_tag_name_can_be_lazily_evaluated(self, monkeypatch):
+        monkeypatch.setattr(cavorite.cavorite, 'js', js)
+        node = c(lambda: "div")
+        assert node.get_tag_name() == 'div'
+
