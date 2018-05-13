@@ -12,6 +12,8 @@ from cavorite.cavorite.HTML import *
 
 c = cavorite.cavorite.c
 t = cavorite.cavorite.t
+SimpleProxy = cavorite.cavorite.SimpleProxy
+ModalProxy = cavorite.cavorite.ModalProxy
 
 
 class TestChildren(object):
@@ -417,4 +419,82 @@ class TestTagNameIsCallable(object):
         monkeypatch.setattr(cavorite.cavorite, 'js', js)
         node = c(lambda: "div")
         assert node.get_tag_name() == 'div'
+
+class TestProxy(object):
+    def test_proxy_to_subclass(self):
+        proxy_mode = None       
+
+        class TestProxy(SimpleProxy):
+            def get_proxy(self):
+                if proxy_mode == 0:
+                    return c('div')
+                elif proxy_mode == 1:
+                    return c('a', {'href':'https://www.google.com'}, 'Google')
+                elif proxy_mode == 2:
+                    return c('p', 'Hello world')
+
+        proxied_object = TestProxy()
+
+        proxy_mode = 0
+
+        assert proxied_object.get_tag_name() == 'div'
+        assert len(proxied_object.get_attribs()) == 1
+        assert '_cavorite_id'  in proxied_object.get_attribs()
+        assert proxied_object.get_children() == []
+
+        proxy_mode = 1
+
+        assert proxied_object.get_tag_name() == 'a'
+        assert len(proxied_object.get_attribs()) == 2
+        assert '_cavorite_id'  in proxied_object.get_attribs()
+        assert proxied_object.get_attribs()['href'] == 'https://www.google.com'
+        assert len(proxied_object.get_children()) == 1
+        child = proxied_object.get_children()[0]
+        assert isinstance(child, t)
+        assert child.text == 'Google'
+
+        proxy_mode = 2
+
+        assert proxied_object.get_tag_name() == 'p'
+        assert len(proxied_object.get_attribs()) == 1
+        assert '_cavorite_id'  in proxied_object.get_attribs()
+        assert len(proxied_object.get_children()) == 1
+        child = proxied_object.get_children()[0]
+        assert isinstance(child, t)
+        assert child.text == 'Hello world'
+
+class TestModalProxy(object):
+    def test_modal_proxy_to_subclass(self):
+        proxy = ModalProxy({ 0:  c('div'),
+                             1: lambda :c('a', {'href':'https://www.google.com'}, 'Google'),
+                             2: lambda :c('p', 'Hello world')})
+
+        proxy.set_mode(0)
+        assert proxy.get_tag_name() == 'div'
+        assert len(proxy.get_attribs()) == 1
+        assert '_cavorite_id'  in proxy.get_attribs()
+        assert proxy.get_children() == []
+
+        proxy.set_mode(1)
+
+        assert proxy.get_tag_name() == 'a'
+        assert len(proxy.get_attribs()) == 2
+        assert '_cavorite_id'  in proxy.get_attribs()
+        assert proxy.get_attribs()['href'] == 'https://www.google.com'
+        assert len(proxy.get_children()) == 1
+        child = proxy.get_children()[0]
+        assert isinstance(child, t)
+        assert child.text == 'Google'
+
+        proxy.set_mode(2)
+
+        assert proxy.get_tag_name() == 'p'
+        assert len(proxy.get_attribs()) == 1
+        assert '_cavorite_id'  in proxy.get_attribs()
+        assert len(proxy.get_children()) == 1
+        child = proxy.get_children()[0]
+        assert isinstance(child, t)
+        assert child.text == 'Hello world'
+
+        
 

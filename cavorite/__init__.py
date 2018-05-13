@@ -327,6 +327,35 @@ class VNode(object):
 
 c = VNode
 
+class SimpleProxy(VNode):
+    # A proxy class allows us to a have VNode act as a proxy for another VNode. This
+    # class calls the get_proxy function returns the VNode to use it it's place
+    def __init__(self):
+        super(SimpleProxy, self).__init__('')
+
+    def get_tag_name(self):
+        return self.get_proxy().get_tag_name()
+
+    def get_attribs(self):
+        return self.get_proxy().get_attribs()
+
+    def get_children(self):
+        return self.get_proxy().get_children()
+
+class ModalProxy(SimpleProxy):
+    def __init__(self, proxies):
+        self._proxies = proxies
+        self._proxy_results = {}
+        super(ModalProxy, self).__init__()
+
+    def set_mode(self, mode):
+        self._mode = mode
+
+    def get_proxy(self):
+        if self._mode not in self._proxy_results:
+            self._proxy_results[self._mode] = lazy_eval(self._proxies[self._mode])
+        return self._proxy_results[self._mode]
+        
 
 global_router_on_body_mousemove = None
 global_router_on_hash_change = None
