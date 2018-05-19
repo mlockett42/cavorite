@@ -41,6 +41,13 @@ class MockElement(object):
     @property
     def lastChild(self):
         return self.children.l[-1]
+    @property
+    def options(self):
+        assert self.tagName.lower() == 'select' # Only select's may have options
+        # Options is a JSList of all of our children that are option tags
+        ret = MockJSList()
+        ret.l = [e for e in self.children.l if e.tagName == 'option']
+        return ret
 
 class MockElementSVG(MockElement):
     pass
