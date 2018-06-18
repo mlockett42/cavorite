@@ -154,7 +154,7 @@ class VNode(object):
 
     def _build_virtual_dom(self):
         # Build a copy of the Virtual DOM but render each tag as it's based HTML tag
-        clone = VNode(self.get_tag_name(), copy.copy(self.attribs))
+        clone = VNode(self.get_tag_name(), copy.copy(self.get_attribs()))
         clone.original = self
         for child in self.get_children():
             clone.children.append(child._build_virtual_dom())
@@ -281,21 +281,32 @@ class VNode(object):
         del attribs1['_cavorite_id']
         attribs2 = copy.copy(virtual_dom2.attribs)
         del attribs2['_cavorite_id']
+        #print('_get_dom_changes self=', self)
+        #print('_get_dom_changes self.get_tag_name()=', self.get_tag_name(), ',virtual_dom2.get_tag_name()=', virtual_dom2.get_tag_name())
+        #print('_get_dom_changes self.get_tag_name()=', self.get_tag_name(), ',virtual_dom2.get_tag_name()=', virtual_dom2.get_tag_name())
+        #print('_get_dom_changes attribs1=', attribs1, ',attribs2=', attribs2)
+        #print('_get_dom_changes self.children=', self.children, ',virtual_dom2.children=', virtual_dom2.children)
         if self.get_tag_name() != virtual_dom2.get_tag_name() or attribs1 != attribs2 or \
             len(self.children) != len(virtual_dom2.children):
                 return [(self, virtual_dom2)]
         r = [self.children[i]._get_dom_changes(virtual_dom2.children[i]) for i in range(len(self.children))]
-        return itertools.chain.from_iterable(r)
+        #print('_get_dom_changes r=', r)
+        ret = itertools.chain.from_iterable(r)
+        #print('_get_dom_changes ret=', list(ret))
+        return list(ret)
 
     def mount_redraw(self):
         # Redraw the view. This will determine which DOM elements have changed and redraw them
         virtual_dom2 = self._build_virtual_dom()
         elements_to_change = list(self._virtual_dom._get_dom_changes(virtual_dom2))
-        if any([live_vnode.parent is None for (live_vnode, new_vnode) in elements_to_change]):
+        #print('mount_redraw elements_to_change=', elements_to_change)
+        if any([live_vnode.parent is None for (live_vnode, new_vnode) in elements_to_change]): # Temporaily force full redraws
+            #print('mount_redraw redrawing all forced')
             # If the root node has changed just redraw everything the rest of our logic in irrelevant
             self.render(self.mounted_element)
             self.attach_script_nodes(self.mounted_element)
         else:
+            #print('mount_redraw redrawing individual elements')
             for (live_vnode, new_vnode) in elements_to_change:
                 live_parent = live_vnode.parent
                 new_element = new_vnode._render(live_parent)
