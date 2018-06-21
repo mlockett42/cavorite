@@ -169,6 +169,39 @@ class VNode(object):
             element.appendChild(scriptElement)
     
         add_script_element(
+"""function isJson(item) { /* From https://stackoverflow.com/a/33369954*/
+    item = typeof item !== "string"
+        ? JSON.stringify(item)
+        : item;
+
+    try {
+        item = JSON.parse(item);
+    } catch (e) {
+        return false;
+    }
+
+    if (typeof item === "object" && item !== null) {
+        return true;
+    }
+
+    return false;
+}
+""")
+        add_script_element(
+"""
+    function isXML(xml){
+        try {
+            var parser, xmlDoc;
+            parser = new DOMParser();
+            xmlDoc = parser.parseFromString(xml,"text/xml");
+            return true;
+        } catch (err) {
+            // was not XML
+            return false;
+        }
+    }
+""")
+        add_script_element(
 """function cavorite_setTimeout(key, delay) { 
     return setTimeout(function() { 
         document.cavorite_timeouthandler(key); 
@@ -192,8 +225,11 @@ class VNode(object):
         xmlhttp.onreadystatechange = function(){
             var parsedresult = null;
             if (xmlhttp.readyState == XMLHttpRequest.DONE) {   // XMLHttpRequest.DONE == 4
-                if (xmlhttp.status == 200) {
+                if (xmlhttp.status == 200 && isJson(xmlhttp.responseText)) {
                     parsedresult = JSON.parse(xmlhttp.responseText);
+                } else if (xmlhttp.status == 200 && isXML(xmlhttp.responseText)) {
+                    var parser = new DOMParser();
+                    parsedresult = parser.parseFromString(xmlhttp.responseText,"text/xml");
                 }
                 document.cavorite_AjaxGetCallback(xmlhttp, key, parsedresult);
             }
@@ -213,8 +249,11 @@ class VNode(object):
         xmlhttp.onreadystatechange = function(){
             var parsedresult = null;
             if (xmlhttp.readyState == XMLHttpRequest.DONE) {   // XMLHttpRequest.DONE == 4
-                if (xmlhttp.status == 200) {
+                if (xmlhttp.status == 200 && isJson(xmlhttp.responseText)) {
                     parsedresult = JSON.parse(xmlhttp.responseText);
+                } else if (xmlhttp.status == 200 && isXML(xmlhttp.responseText)) {
+                    var parser = new DOMParser();
+                    parsedresult = parser.parseFromString(xmlhttp.responseText,"text/xml");
                 }
                 document.cavorite_AjaxPostCallback(xmlhttp, key, parsedresult);
             }
@@ -234,8 +273,11 @@ class VNode(object):
         xmlhttp.onreadystatechange = function(){
             var parsedresult = null;
             if (xmlhttp.readyState == XMLHttpRequest.DONE) {   // XMLHttpRequest.DONE == 4
-                if (xmlhttp.status == 200) {
+                if (xmlhttp.status == 200 && isJson(xmlhttp.responseText)) {
                     parsedresult = JSON.parse(xmlhttp.responseText);
+                } else if (xmlhttp.status == 200 && isXML(xmlhttp.responseText)) {
+                    var parser = new DOMParser();
+                    parsedresult = parser.parseFromString(xmlhttp.responseText,"text/xml");
                 }
                 document.cavorite_AjaxPutCallback(xmlhttp, key, parsedresult);
             }
@@ -249,8 +291,11 @@ class VNode(object):
         xmlhttp.onreadystatechange = function(){
             var parsedresult = null;
             if (xmlhttp.readyState == XMLHttpRequest.DONE) {   // XMLHttpRequest.DONE == 4
-                if (xmlhttp.status == 200) {
+                if (xmlhttp.status == 200 && isJson(xmlhttp.responseText)) {
                     parsedresult = JSON.parse(xmlhttp.responseText);
+                } else if (xmlhttp.status == 200 && isXML(xmlhttp.responseText)) {
+                    var parser = new DOMParser();
+                    parsedresult = parser.parseFromString(xmlhttp.responseText,"text/xml");
                 }
                 document.cavorite_AjaxDeleteCallback(xmlhttp, key, parsedresult);
             }
