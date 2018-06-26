@@ -8,6 +8,7 @@ import uuid
 from cavorite.cavorite.HTML import *
 from mock import Mock
 from cavorite.cavorite import ajaxget
+import pytest
 
 c = cavorite.cavorite.c
 t = cavorite.cavorite.t
@@ -20,7 +21,7 @@ Router = cavorite.cavorite.Router
 
 class TestAjaxGetBehaviour(object):
 
-    def test_timeouts_are_routed_correctly(self, monkeypatch):
+    def test_get_requests_are_routed_correctly(self, monkeypatch):
         def dummy_uuid():
             return uuid.UUID('531cb169-91f4-4102-9a0a-2cd5e9659071')
 
@@ -56,7 +57,7 @@ class TestAjaxGetBehaviour(object):
 
 class TestAjaxPostBehaviour(object):
 
-    def test_timeouts_are_routed_correctly(self, monkeypatch):
+    def test_post_requests_are_routed_correctly(self, monkeypatch):
         def dummy_uuid():
             return uuid.UUID('531cb169-91f4-4102-9a0a-2cd5e9659071')
 
@@ -163,4 +164,57 @@ class TestAjaxDeleteBehaviour(object):
         assert counter['count'] == 1
         assert len(ajaxget.global_ajaxdelete_callbacks) == 0
 
+class TestAjaxErrorHandlingBehaviour(object):
 
+    def dummy_callback(self, xmlhttp, response):
+        assert False
+
+    def dummy_uuid(self):
+        return uuid.UUID('531cb169-91f4-4102-9a0a-2cd5e9659071')
+
+    def gen_request_errors_are_handled_correctly(self, monkeypatch, capsys,
+                                                 ajax_fn, callback_fn):
+
+        monkeypatch.setattr(cavorite.cavorite, 'js', js)
+        monkeypatch.setattr(callbacks, 'js', js)
+        monkeypatch.setattr(ajaxget, 'js', js)
+        monkeypatch.setattr(ajaxget, 'get_uuid', self.dummy_uuid)
+        callbacks.initialise_global_callbacks()
+        ajaxget.initialise_ajaxget_callbacks()
+
+        defaultroute = c('p', 'Hello world')
+
+        r = Router({ }, defaultroute, js.globals.document.body)
+        r.route()
+
+        ajax_fn()
+
+        with pytest.raises(AssertionError):
+            callback_fn()
+
+        out, err = capsys.readouterr()
+        assert 'AssertionError' in out
+
+    def test_get_request_errors_are_handled_correctly(self, monkeypatch, capsys):
+        self.gen_request_errors_are_handled_correctly(monkeypatch, capsys,
+            lambda: ajaxget.ajaxget('/hello_world', self.dummy_callback),
+            lambda: js.globals.document.cavorite_AjaxGetCallback(Mock(), str(self.dummy_uuid()), 'OK'),
+            )
+
+    def test_post_request_errors_are_handled_correctly(self, monkeypatch, capsys):
+        self.gen_request_errors_are_handled_correctly(monkeypatch, capsys,
+            lambda: ajaxget.ajaxpost('/hello_world', {'key': 'value'}, self.dummy_callback),
+            lambda: js.globals.document.cavorite_AjaxPostCallback(Mock(), str(self.dummy_uuid()), 'OK'),
+            )
+
+    def test_put_request_errors_are_handled_correctly(self, monkeypatch, capsys):
+        self.gen_request_errors_are_handled_correctly(monkeypatch, capsys,
+            lambda: ajaxget.ajaxput('/hello_world', {'key': 'value'}, self.dummy_callback),
+            lambda: js.globals.document.cavorite_AjaxPutCallback(Mock(), str(self.dummy_uuid()), 'OK'),
+            )
+
+    def test_delete_request_errors_are_handled_correctly(self, monkeypatch, capsys):
+        self.gen_request_errors_are_handled_correctly(monkeypatch, capsys,
+            lambda: ajaxget.ajaxdelete('/hello_world', self.dummy_callback),
+            lambda: js.globals.document.cavorite_AjaxDeleteCallback(Mock(), str(self.dummy_uuid()), 'OK'),
+            )

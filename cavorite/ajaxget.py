@@ -6,6 +6,7 @@ except ImportError:
     js = None
 from . import get_uuid
 import uuid
+from .exceptions import output_exceptions
 
 global_ajaxget_callbacks = None
 global_ajaxpost_callbacks = None
@@ -23,6 +24,7 @@ def initialise_ajaxget_callbacks():
     global_ajaxget_callbacks = dict()
 
     @js.Function
+    @output_exceptions
     def cavorite_ajaxgethandler(xmlhttp, key, response):
         key = str(key)
         global global_ajaxget_callbacks
@@ -41,6 +43,7 @@ def initialise_ajaxget_callbacks():
     global_ajaxpost_callbacks = dict()
 
     @js.Function
+    @output_exceptions
     def cavorite_ajaxposthandler(xmlhttp, key, response):
         key = str(key)
         global global_ajaxpost_callbacks
@@ -59,6 +62,7 @@ def initialise_ajaxget_callbacks():
     global_ajaxput_callbacks = dict()
 
     @js.Function
+    @output_exceptions
     def cavorite_ajaxputhandler(xmlhttp, key, response):
         key = str(key)
         global global_ajaxput_callbacks
@@ -77,6 +81,7 @@ def initialise_ajaxget_callbacks():
     global_ajaxdelete_callbacks = dict()
 
     @js.Function
+    @output_exceptions
     def cavorite_ajaxdeletehandler(xmlhttp, key, response):
         key = str(key)
         global global_ajaxdelete_callbacks
@@ -130,5 +135,3 @@ def ajaxdelete(url, handler_fn):
     global_ajaxdelete_callbacks[function_id] = handler_fn
 
     val = js.globals.cavorite_ajaxDelete(url, function_id)
-
-

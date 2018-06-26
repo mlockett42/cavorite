@@ -6,6 +6,7 @@ except ImportError:
     js = None
 from . import get_uuid
 import uuid
+from .exceptions import output_exceptions
 
 global_timeout_callbacks = None
 global_timeout_val_to_id = None
@@ -34,6 +35,7 @@ def initialise_timeout_callbacks():
     global_interval_id_to_val = dict()
 
     @js.Function
+    @output_exceptions
     def cavorite_timeouthandler(key):
         key = str(key)
         global global_timeout_callbacks
@@ -53,6 +55,7 @@ def initialise_timeout_callbacks():
     global_cavorite_timeouthandler = cavorite_timeouthandler
 
     @js.Function
+    @output_exceptions
     def cavorite_intervalhandler(key):
         key = str(key)
         global global_interval_callbacks
@@ -123,4 +126,3 @@ def clear_interval(val):
     del global_interval_val_to_id[val]
     del global_interval_id_to_val[function_id]
     del global_interval_callbacks[function_id]
-

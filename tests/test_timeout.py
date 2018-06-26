@@ -6,6 +6,8 @@ from cavorite.cavorite import callbacks
 from cavorite.cavorite import timeouts
 import uuid
 from cavorite.cavorite.HTML import *
+import pytest
+
 
 c = cavorite.cavorite.c
 t = cavorite.cavorite.t
@@ -204,4 +206,57 @@ class TestTimeoutBehaviour(object):
         assert len(timeouts.global_interval_val_to_id) == 0
         assert len(timeouts.global_interval_id_to_val) == 0
 
+class TestTimeoutErrorBehaviour(object):
+    def test_timeout_errors_are_handled_correctly(self, monkeypatch, capsys):
+        def dummy_uuid():
+            return uuid.UUID('531cb169-91f4-4102-9a0a-2cd5e9659071')
 
+        monkeypatch.setattr(cavorite.cavorite, 'js', js)
+        monkeypatch.setattr(callbacks, 'js', js)
+        monkeypatch.setattr(timeouts, 'js', js)
+        monkeypatch.setattr(timeouts, 'get_uuid', dummy_uuid)
+        callbacks.initialise_global_callbacks()
+        timeouts.initialise_timeout_callbacks()
+
+        defaultroute = c('p', 'Hello world')
+
+        r = Router({ }, defaultroute, js.globals.document.body)
+        r.route()
+
+        def dummy_callback():
+            assert False
+
+        val = timeouts.set_timeout(dummy_callback, 1)
+
+        with pytest.raises(AssertionError):
+            js.globals.document.cavorite_timeouthandler(str(dummy_uuid()))
+
+        out, err = capsys.readouterr()
+        assert 'AssertionError' in out
+
+    def test_interval_errors_are_handled_correctly(self, monkeypatch, capsys):
+        def dummy_uuid():
+            return uuid.UUID('531cb169-91f4-4102-9a0a-2cd5e9659071')
+
+        monkeypatch.setattr(cavorite.cavorite, 'js', js)
+        monkeypatch.setattr(callbacks, 'js', js)
+        monkeypatch.setattr(timeouts, 'js', js)
+        monkeypatch.setattr(timeouts, 'get_uuid', dummy_uuid)
+        callbacks.initialise_global_callbacks()
+        timeouts.initialise_timeout_callbacks()
+
+        defaultroute = c('p', 'Hello world')
+
+        r = Router({ }, defaultroute, js.globals.document.body)
+        r.route()
+
+        def dummy_callback():
+            assert False
+
+        val = timeouts.set_interval(dummy_callback, 1)
+
+        with pytest.raises(AssertionError):
+            js.globals.document.cavorite_intervalhandler(str(dummy_uuid()))
+
+        out, err = capsys.readouterr()
+        assert 'AssertionError' in out
