@@ -49,8 +49,8 @@ t = TextNode
 
 
 class VNode(object):
-    def __init__(self, tag, attribs=None, children=None, cssClass=None, **kwargs):
-        self.tag = tag
+    def __init__(self, tag_name, attribs=None, children=None, cssClass=None, **kwargs):
+        self.tag_name = tag_name
         self.attribs = dict()
         self.children = []
         self.parent = None
@@ -87,6 +87,8 @@ class VNode(object):
             assert 'class' not in self.attribs, 'Cannot define css class twice'
             self.attribs['class'] = cssClass
         if 'class' in self.attribs and isinstance(self.attribs['class'], list):
+            #TODO: This where class can be a list of strings doesn't work for functional
+            # parameters if defined here
             self.attribs['class'] = ' '.join(self.attribs['class'])
 
         # Make sure no parameters are in both the attribs and the kwargs
@@ -135,7 +137,7 @@ class VNode(object):
         
     def _render(self, element):
         # Output this nvnode and its children to the DOM
-        new_element = self._createDOMElement(self.tag)
+        new_element = self._createDOMElement(self.get_tag_name())
         self.dom_element = new_element
         for k, v in self.get_attribs().items():
             if k in callbacks.global_callback_handlers:
@@ -152,7 +154,7 @@ class VNode(object):
 
     def _build_virtual_dom(self):
         # Build a copy of the Virtual DOM but render each tag as it's based HTML tag
-        clone = VNode(self.tag, copy.copy(self.attribs))
+        clone = VNode(self.get_tag_name(), copy.copy(self.get_attribs()))
         clone.original = self
         for child in self.get_children():
             clone.children.append(child._build_virtual_dom())
@@ -166,6 +168,39 @@ class VNode(object):
             scriptElement.appendChild(scriptTextNode)
             element.appendChild(scriptElement)
     
+        add_script_element(
+"""function isJson(item) { /* From https://stackoverflow.com/a/33369954*/
+    item = typeof item !== "string"
+        ? JSON.stringify(item)
+        : item;
+
+    try {
+        item = JSON.parse(item);
+    } catch (e) {
+        return false;
+    }
+
+    if (typeof item === "object" && item !== null) {
+        return true;
+    }
+
+    return false;
+}
+""")
+        add_script_element(
+"""
+    function isXML(xml){
+        try {
+            var parser, xmlDoc;
+            parser = new DOMParser();
+            xmlDoc = parser.parseFromString(xml,"text/xml");
+            return true;
+        } catch (err) {
+            // was not XML
+            return false;
+        }
+    }
+""")
         add_script_element(
 """function cavorite_setTimeout(key, delay) { 
     return setTimeout(function() { 
@@ -190,8 +225,11 @@ class VNode(object):
         xmlhttp.onreadystatechange = function(){
             var parsedresult = null;
             if (xmlhttp.readyState == XMLHttpRequest.DONE) {   // XMLHttpRequest.DONE == 4
-                if (xmlhttp.status == 200) {
+                if (xmlhttp.status == 200 && isJson(xmlhttp.responseText)) {
                     parsedresult = JSON.parse(xmlhttp.responseText);
+                } else if (xmlhttp.status == 200 && isXML(xmlhttp.responseText)) {
+                    var parser = new DOMParser();
+                    parsedresult = parser.parseFromString(xmlhttp.responseText,"text/xml");
                 }
                 document.cavorite_AjaxGetCallback(xmlhttp, key, parsedresult);
             }
@@ -211,8 +249,11 @@ class VNode(object):
         xmlhttp.onreadystatechange = function(){
             var parsedresult = null;
             if (xmlhttp.readyState == XMLHttpRequest.DONE) {   // XMLHttpRequest.DONE == 4
-                if (xmlhttp.status == 200) {
+                if (xmlhttp.status == 200 && isJson(xmlhttp.responseText)) {
                     parsedresult = JSON.parse(xmlhttp.responseText);
+                } else if (xmlhttp.status == 200 && isXML(xmlhttp.responseText)) {
+                    var parser = new DOMParser();
+                    parsedresult = parser.parseFromString(xmlhttp.responseText,"text/xml");
                 }
                 document.cavorite_AjaxPostCallback(xmlhttp, key, parsedresult);
             }
@@ -232,8 +273,11 @@ class VNode(object):
         xmlhttp.onreadystatechange = function(){
             var parsedresult = null;
             if (xmlhttp.readyState == XMLHttpRequest.DONE) {   // XMLHttpRequest.DONE == 4
-                if (xmlhttp.status == 200) {
+                if (xmlhttp.status == 200 && isJson(xmlhttp.responseText)) {
                     parsedresult = JSON.parse(xmlhttp.responseText);
+                } else if (xmlhttp.status == 200 && isXML(xmlhttp.responseText)) {
+                    var parser = new DOMParser();
+                    parsedresult = parser.parseFromString(xmlhttp.responseText,"text/xml");
                 }
                 document.cavorite_AjaxPutCallback(xmlhttp, key, parsedresult);
             }
@@ -247,8 +291,11 @@ class VNode(object):
         xmlhttp.onreadystatechange = function(){
             var parsedresult = null;
             if (xmlhttp.readyState == XMLHttpRequest.DONE) {   // XMLHttpRequest.DONE == 4
-                if (xmlhttp.status == 200) {
+                if (xmlhttp.status == 200 && isJson(xmlhttp.responseText)) {
                     parsedresult = JSON.parse(xmlhttp.responseText);
+                } else if (xmlhttp.status == 200 && isXML(xmlhttp.responseText)) {
+                    var parser = new DOMParser();
+                    parsedresult = parser.parseFromString(xmlhttp.responseText,"text/xml");
                 }
                 document.cavorite_AjaxDeleteCallback(xmlhttp, key, parsedresult);
             }
@@ -279,21 +326,32 @@ class VNode(object):
         del attribs1['_cavorite_id']
         attribs2 = copy.copy(virtual_dom2.attribs)
         del attribs2['_cavorite_id']
-        if self.tag != virtual_dom2.tag or attribs1 != attribs2 or \
+        #print('_get_dom_changes self=', self)
+        #print('_get_dom_changes self.get_tag_name()=', self.get_tag_name(), ',virtual_dom2.get_tag_name()=', virtual_dom2.get_tag_name())
+        #print('_get_dom_changes self.get_tag_name()=', self.get_tag_name(), ',virtual_dom2.get_tag_name()=', virtual_dom2.get_tag_name())
+        #print('_get_dom_changes attribs1=', attribs1, ',attribs2=', attribs2)
+        #print('_get_dom_changes self.children=', self.children, ',virtual_dom2.children=', virtual_dom2.children)
+        if self.get_tag_name() != virtual_dom2.get_tag_name() or attribs1 != attribs2 or \
             len(self.children) != len(virtual_dom2.children):
                 return [(self, virtual_dom2)]
         r = [self.children[i]._get_dom_changes(virtual_dom2.children[i]) for i in range(len(self.children))]
-        return itertools.chain.from_iterable(r)
+        #print('_get_dom_changes r=', r)
+        ret = itertools.chain.from_iterable(r)
+        #print('_get_dom_changes ret=', list(ret))
+        return list(ret)
 
     def mount_redraw(self):
         # Redraw the view. This will determine which DOM elements have changed and redraw them
         virtual_dom2 = self._build_virtual_dom()
         elements_to_change = list(self._virtual_dom._get_dom_changes(virtual_dom2))
-        if any([live_vnode.parent is None for (live_vnode, new_vnode) in elements_to_change]):
+        #print('mount_redraw elements_to_change=', elements_to_change)
+        if any([live_vnode.parent is None for (live_vnode, new_vnode) in elements_to_change]): # Temporaily force full redraws
+            #print('mount_redraw redrawing all forced')
             # If the root node has changed just redraw everything the rest of our logic in irrelevant
             self.render(self.mounted_element)
             self.attach_script_nodes(self.mounted_element)
         else:
+            #print('mount_redraw redrawing individual elements')
             for (live_vnode, new_vnode) in elements_to_change:
                 live_parent = live_vnode.parent
                 new_element = new_vnode._render(live_parent)
@@ -318,9 +376,42 @@ class VNode(object):
         # the last move
         pass
 
+    def get_tag_name(self):
+        # Returns the tag name, can be overridden in subclasses for dynamic behaviour
+        return lazy_eval(self.tag_name)
+
 
 c = VNode
 
+class SimpleProxy(VNode):
+    # A proxy class allows us to a have VNode act as a proxy for another VNode. This
+    # class calls the get_proxy function returns the VNode to use it it's place
+    def __init__(self):
+        super(SimpleProxy, self).__init__('')
+
+    def get_tag_name(self):
+        return self.get_proxy().get_tag_name()
+
+    def get_attribs(self):
+        return self.get_proxy().get_attribs()
+
+    def get_children(self):
+        return self.get_proxy().get_children()
+
+class ModalProxy(SimpleProxy):
+    def __init__(self, proxies):
+        self._proxies = proxies
+        self._proxy_results = {}
+        super(ModalProxy, self).__init__()
+
+    def set_mode(self, mode):
+        self._mode = mode
+
+    def get_proxy(self):
+        if self._mode not in self._proxy_results:
+            self._proxy_results[self._mode] = lazy_eval(self._proxies[self._mode])
+        return self._proxy_results[self._mode]
+        
 
 global_router_on_body_mousemove = None
 global_router_on_hash_change = None

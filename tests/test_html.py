@@ -12,7 +12,7 @@ class TestTags(object):
             theclass = globals()[tagname]
             assert inspect.isclass(theclass)
             obj = theclass()
-            assert obj.tag == tagname
+            assert obj.get_tag_name() == tagname
 
             obj2 = theclass({'class': 'stuff'}, [t('Hello'), t('World')])
             assert obj2.get_attribs()['class'] =='stuff'
