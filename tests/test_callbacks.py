@@ -17,11 +17,11 @@ class TestCallbackExceptionHandling(object):
         target.html_attribs['_cavorite_id'] = '41a2b617-3dfe-4f39-8a14-58bea7459db2'
 
         callbacks.initialise_global_callbacks()
-        callbacks.global_callbacks['onclick'][
+        callbacks.global_callbacks[handler_name][
             '41a2b617-3dfe-4f39-8a14-58bea7459db2'] = fail_now
 
         with pytest.raises(AssertionError):
-            callbacks.global_callback_handlers['onclick'](Mock(target=target))
+            callbacks.global_callback_handlers[handler_name](Mock(target=target))
 
         out, err = capsys.readouterr()
         assert 'AssertionError' in out
