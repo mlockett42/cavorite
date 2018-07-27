@@ -31,7 +31,7 @@ def initialise_global_callbacks():
         callbacks = global_callbacks['onclick']
         target = e.target
         cavorite_id = str(target.getAttribute('_cavorite_id'))
-        if cavorite_id in callbacks:
+        if cavorite_id in callbacks and callbacks[cavorite_id] is not None:
             callbacks[cavorite_id](e)
 
     global global_callback_handlers
@@ -44,7 +44,7 @@ def initialise_global_callbacks():
         callbacks = global_callbacks['onchange']
         target = e.target
         cavorite_id = str(target.getAttribute('_cavorite_id'))
-        if cavorite_id in callbacks:
+        if cavorite_id in callbacks and callbacks[cavorite_id] is not None:
             callbacks[cavorite_id](e)
     global_callback_handlers['onchange'] = local_onchange_handler
 
@@ -55,7 +55,7 @@ def initialise_global_callbacks():
         callbacks = global_callbacks['oncontextmenu']
         target = e.target
         cavorite_id = str(target.getAttribute('_cavorite_id'))
-        if cavorite_id in callbacks:
+        if cavorite_id in callbacks and callbacks[cavorite_id] is not None:
             callbacks[cavorite_id](e)
     global_callback_handlers['oncontextmenu'] = local_oncontextmenu_handler
 
@@ -66,7 +66,7 @@ def initialise_global_callbacks():
         callbacks = global_callbacks['ondblclick']
         target = e.target
         cavorite_id = str(target.getAttribute('_cavorite_id'))
-        if cavorite_id in callbacks:
+        if cavorite_id in callbacks and callbacks[cavorite_id] is not None:
             callbacks[cavorite_id](e)
     global_callback_handlers['ondblclick'] = local_ondblclick_handler
 
@@ -77,7 +77,7 @@ def initialise_global_callbacks():
         callbacks = global_callbacks['onmousedown']
         target = e.target
         cavorite_id = str(target.getAttribute('_cavorite_id'))
-        if cavorite_id in callbacks:
+        if cavorite_id in callbacks and callbacks[cavorite_id] is not None:
             callbacks[cavorite_id](e)
     global_callback_handlers['onmousedown'] = local_onmousedown_handler
 
@@ -88,7 +88,7 @@ def initialise_global_callbacks():
         callbacks = global_callbacks['onmouseenter']
         target = e.target
         cavorite_id = str(target.getAttribute('_cavorite_id'))
-        if cavorite_id in callbacks:
+        if cavorite_id in callbacks and callbacks[cavorite_id] is not None:
             callbacks[cavorite_id](e)
     global_callback_handlers['onmouseenter'] = local_onmouseenter_handler
 
@@ -99,7 +99,7 @@ def initialise_global_callbacks():
         callbacks = global_callbacks['onmouseleave']
         target = e.target
         cavorite_id = str(target.getAttribute('_cavorite_id'))
-        if cavorite_id in callbacks:
+        if cavorite_id in callbacks and callbacks[cavorite_id] is not None:
             callbacks[cavorite_id](e)
     global_callback_handlers['onmouseleave'] = local_onmouseleave_handler
 
@@ -110,7 +110,7 @@ def initialise_global_callbacks():
         callbacks = global_callbacks['onmousemove']
         target = e.target
         cavorite_id = str(target.getAttribute('_cavorite_id'))
-        if cavorite_id in callbacks:
+        if cavorite_id in callbacks and callbacks[cavorite_id] is not None:
             callbacks[cavorite_id](e)
     global_callback_handlers['onmousemove'] = local_onmousemove_handler
 
@@ -121,7 +121,7 @@ def initialise_global_callbacks():
         callbacks = global_callbacks['onmouseover']
         target = e.target
         cavorite_id = str(target.getAttribute('_cavorite_id'))
-        if cavorite_id in callbacks:
+        if cavorite_id in callbacks and callbacks[cavorite_id] is not None:
             callbacks[cavorite_id](e)
     global_callback_handlers['onmouseover'] = local_onmouseover_handler
 
@@ -132,7 +132,7 @@ def initialise_global_callbacks():
         callbacks = global_callbacks['onmouseup']
         target = e.target
         cavorite_id = str(target.getAttribute('_cavorite_id'))
-        if cavorite_id in callbacks:
+        if cavorite_id in callbacks and callbacks[cavorite_id] is not None:
             callbacks[cavorite_id](e)
     global_callback_handlers['onmouseup'] = local_onmouseup_handler
 
@@ -143,6 +143,6 @@ def initialise_global_callbacks():
         callbacks = global_callbacks['onsubmit']
         target = e.target
         cavorite_id = str(target.getAttribute('_cavorite_id'))
-        if cavorite_id in callbacks:
+        if cavorite_id in callbacks and callbacks[cavorite_id] is not None:
             callbacks[cavorite_id](e)
     global_callback_handlers['onsubmit'] = local_onsubmit_handler

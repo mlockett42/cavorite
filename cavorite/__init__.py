@@ -134,7 +134,7 @@ class VNode(object):
 
     def _createDOMElement(self, tag):
         return js.globals.document.createElement(tag)
-        
+
     def _render(self, element):
         # Output this nvnode and its children to the DOM
         new_element = self._createDOMElement(self.get_tag_name())
@@ -158,7 +158,7 @@ class VNode(object):
         clone.original = self
         for child in self.get_children():
             clone.children.append(child._build_virtual_dom())
-        return clone  
+        return clone
 
     def attach_script_nodes(self, element):
         # Script nodes are helper objects for callbacks they need to be inserted manually
@@ -167,7 +167,7 @@ class VNode(object):
             scriptElement = js.globals.document.createElement('script')
             scriptElement.appendChild(scriptTextNode)
             element.appendChild(scriptElement)
-    
+
         add_script_element(
 """function isJson(item) { /* From https://stackoverflow.com/a/33369954*/
     item = typeof item !== "string"
@@ -202,25 +202,25 @@ class VNode(object):
     }
 """)
         add_script_element(
-"""function cavorite_setTimeout(key, delay) { 
-    return setTimeout(function() { 
-        document.cavorite_timeouthandler(key); 
-        },
-        delay);
-    };
-""")
-        
-        add_script_element(
-"""function cavorite_setInterval(key, delay) { 
-    return setInterval(function() { 
-        document.cavorite_intervalhandler(key); 
+"""function cavorite_setTimeout(key, delay) {
+    return setTimeout(function() {
+        document.cavorite_timeouthandler(key);
         },
         delay);
     };
 """)
 
         add_script_element(
-"""function cavorite_ajaxGet(url, key) { 
+"""function cavorite_setInterval(key, delay) {
+    return setInterval(function() {
+        document.cavorite_intervalhandler(key);
+        },
+        delay);
+    };
+""")
+
+        add_script_element(
+"""function cavorite_ajaxGet(url, key) {
         var xmlhttp = new XMLHttpRequest();
         xmlhttp.onreadystatechange = function(){
             var parsedresult = null;
@@ -236,10 +236,10 @@ class VNode(object):
         }
         xmlhttp.open("GET", url, true);
         xmlhttp.send();
-    }""")    
+    }""")
         add_script_element(
-"""function cavorite_ajaxPost(url, key, data) { 
-        var formdata = new FormData();    
+"""function cavorite_ajaxPost(url, key, data) {
+        var formdata = new FormData();
         var value;
         Object.keys(data).forEach(function(key) {
             value = data[key];
@@ -260,10 +260,10 @@ class VNode(object):
         }
         xmlhttp.open("POST", url, true);
         xmlhttp.send(formdata);
-    }""")    
+    }""")
         add_script_element(
-"""function cavorite_ajaxPut(url, key, data) { 
-        var formdata = new FormData();    
+"""function cavorite_ajaxPut(url, key, data) {
+        var formdata = new FormData();
         var value;
         Object.keys(data).forEach(function(key) {
             value = data[key];
@@ -284,9 +284,9 @@ class VNode(object):
         }
         xmlhttp.open("PUT", url, true);
         xmlhttp.send(formdata);
-    }""")    
+    }""")
         add_script_element(
-"""function cavorite_ajaxDelete(url, key) { 
+"""function cavorite_ajaxDelete(url, key) {
         var xmlhttp = new XMLHttpRequest();
         xmlhttp.onreadystatechange = function(){
             var parsedresult = null;
@@ -302,9 +302,9 @@ class VNode(object):
         }
         xmlhttp.open("DELETE", url, true);
         xmlhttp.send();
-    }""")    
+    }""")
 
-        
+
     def was_mounted(self):
         if isinstance(self.children, list):
             for child in self.get_children():
@@ -365,7 +365,7 @@ class VNode(object):
             return self
         else:
             return self.parent.get_root()
-        
+
     def on_body_click(self, e):
         # Called by the router if the body element is click. Ie a click not handled elsewhere
         # Is passed on the current view
@@ -411,7 +411,7 @@ class ModalProxy(SimpleProxy):
         if self._mode not in self._proxy_results:
             self._proxy_results[self._mode] = lazy_eval(self._proxies[self._mode])
         return self._proxy_results[self._mode]
-        
+
 
 global_router_on_body_mousemove = None
 global_router_on_hash_change = None
@@ -442,7 +442,7 @@ def initialise_global_router_callbacks():
 
 
 class Router(object):
-    # A router handles if we want a SPA. All this means is that a different view is selected into 
+    # A router handles if we want a SPA. All this means is that a different view is selected into
     # the body depending on the hash bang path
 
     # There is only one router so we make it a global for convenience
@@ -515,11 +515,9 @@ class Router(object):
                                               e.clientY - self.global_mouse_y)
         self.global_mouse_x = e.clientX
         self.global_mouse_y = e.clientY
-            
+
 def get_current_hash():
     return str(js.globals.window.location.hash)
 
 def get_uuid():
     return uuid.uuid4()
-
-
