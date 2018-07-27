@@ -55,3 +55,47 @@ class TestCallbackExceptionHandling(object):
 
     def test_exceptions_in_onsubmit_callbacks_are_handled(self, monkeypatch, capsys):
         self.performTest('onsubmit', monkeypatch, capsys)
+
+
+class TestCallbackNone(object):
+    def performTest(self, handler_name, monkeypatch, capsys):
+        monkeypatch.setattr(callbacks, 'js', js)
+
+        target = js.createElement('button')
+        target.html_attribs['_cavorite_id'] = '41a2b617-3dfe-4f39-8a14-58bea7459db2'
+
+        callbacks.initialise_global_callbacks()
+        callbacks.global_callbacks[handler_name][
+            '41a2b617-3dfe-4f39-8a14-58bea7459db2'] = None
+
+        callbacks.global_callback_handlers[handler_name](Mock(target=target))
+
+    def test_none_handling_in_onclick_callbacks_is_handled(self, monkeypatch, capsys):
+        self.performTest('onclick', monkeypatch, capsys)
+
+    def test_none_handling_in_onchange_callbacks_is_handled(self, monkeypatch, capsys):
+        self.performTest('onchange', monkeypatch, capsys)
+
+    def test_none_handling_in_oncontextmenu_callbacks_is_handled(self, monkeypatch, capsys):
+        self.performTest('oncontextmenu', monkeypatch, capsys)
+
+    def test_none_handling_in_ondblclick_callbacks_is_handled(self, monkeypatch, capsys):
+        self.performTest('ondblclick', monkeypatch, capsys)
+
+    def test_exceptions_in_onmousedown_callbacks_are_handled(self, monkeypatch, capsys):
+        self.performTest('onmousedown', monkeypatch, capsys)
+
+    def test_exceptions_in_onmouseenter_callbacks_are_handled(self, monkeypatch, capsys):
+        self.performTest('onmouseenter', monkeypatch, capsys)
+
+    def test_exceptions_in_onmouseleave_callbacks_are_handled(self, monkeypatch, capsys):
+        self.performTest('onmouseleave', monkeypatch, capsys)
+
+    def test_exceptions_in_onmousemove_callbacks_are_handled(self, monkeypatch, capsys):
+        self.performTest('onmousemove', monkeypatch, capsys)
+
+    def test_exceptions_in_onmouseup_callbacks_are_handled(self, monkeypatch, capsys):
+        self.performTest('onmouseup', monkeypatch, capsys)
+
+    def test_exceptions_in_onsubmit_callbacks_are_handled(self, monkeypatch, capsys):
+        self.performTest('onsubmit', monkeypatch, capsys)
