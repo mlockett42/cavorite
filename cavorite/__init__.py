@@ -9,7 +9,7 @@ import itertools
 import re
 import uuid
 from . import callbacks
-
+from .exceptions import output_exceptions
 
 def lazy_eval(v):
     if callable(v):
@@ -420,6 +420,7 @@ global_router_on_body_click = None
 def initialise_global_router_callbacks():
 
     @js.Function
+    @output_exceptions
     def router_on_body_mousemove(e):
         if Router.router:
             Router.router.on_body_mousemove(e)
@@ -427,6 +428,7 @@ def initialise_global_router_callbacks():
     global_router_on_body_mousemove = router_on_body_mousemove
 
     @js.Function
+    @output_exceptions
     def router_on_hash_change(e):
         if Router.router:
             Router.router.onhashchange(e)
@@ -434,6 +436,7 @@ def initialise_global_router_callbacks():
     global_router_on_hash_change = router_on_hash_change
 
     @js.Function
+    @output_exceptions
     def router_on_body_click(e):
         if Router.router:
             Router.router.on_body_click(e)
