@@ -44,6 +44,9 @@ class TextNode(object):
         else:
             return []
 
+    def __str__(self):
+        return str(type(self)) + ' ' + self.text
+
 
 t = TextNode
 
@@ -331,33 +334,47 @@ class VNode(object):
         #print('_get_dom_changes self.get_tag_name()=', self.get_tag_name(), ',virtual_dom2.get_tag_name()=', virtual_dom2.get_tag_name())
         #print('_get_dom_changes attribs1=', attribs1, ',attribs2=', attribs2)
         #print('_get_dom_changes self.children=', self.children, ',virtual_dom2.children=', virtual_dom2.children)
+        #if self.get_tag_name() == 'svg':
+        #    print('_get_dom_changes found svg tag')
+        #    print('_get_dom_changes attribs1=', attribs1,' attribs2=', attribs2)
+        #    print('_get_dom_changes len(self.children)=', len(self.children), ', len(virtual_dom2.children)=', len(virtual_dom2.children))
         if self.get_tag_name() != virtual_dom2.get_tag_name() or attribs1 != attribs2 or \
             len(self.children) != len(virtual_dom2.children):
                 return [(self, virtual_dom2)]
         r = [self.children[i]._get_dom_changes(virtual_dom2.children[i]) for i in range(len(self.children))]
         #print('_get_dom_changes r=', r)
-        ret = itertools.chain.from_iterable(r)
-        #print('_get_dom_changes ret=', list(ret))
-        return list(ret)
+        ret = list(itertools.chain.from_iterable(r))
+        #if len(ret) > 0:
+        #    print('_get_dom_changes ret=', [str(live_vnode) for  live_vnode, new_vnode in ret])
+        #    print('_get_dom_changes len(ret)=', len(ret))
+        return ret
 
     def mount_redraw(self):
         # Redraw the view. This will determine which DOM elements have changed and redraw them
         virtual_dom2 = self._build_virtual_dom()
-        elements_to_change = list(self._virtual_dom._get_dom_changes(virtual_dom2))
+        elements_to_change = self._virtual_dom._get_dom_changes(virtual_dom2)
+        assert isinstance(elements_to_change, list)
         #print('mount_redraw elements_to_change=', elements_to_change)
+        #print('mount_redraw elements_to_change=', [(str(live_vnode), str(new_vnode), live_vnode.parent is None) for (live_vnode, new_vnode) in elements_to_change])
         if any([live_vnode.parent is None for (live_vnode, new_vnode) in elements_to_change]): # Temporaily force full redraws
             #print('mount_redraw redrawing all forced')
             # If the root node has changed just redraw everything the rest of our logic in irrelevant
             self.render(self.mounted_element)
             self.attach_script_nodes(self.mounted_element)
         else:
-            #print('mount_redraw redrawing individual elements')
+            print('mount_redraw redrawing individual elements num elements=', len(elements_to_change))
             for (live_vnode, new_vnode) in elements_to_change:
                 live_parent = live_vnode.parent
                 new_element = new_vnode._render(live_parent)
                 i = live_parent.children.index(live_vnode)
                 live_parent.children[i] = new_vnode
                 live_vnode.dom_element.replaceWith(new_vnode.dom_element)
+            def rebuild_parent_child_relationships(node, parent=None):
+                node.parent = parent
+                if hasattr(node, 'children'):
+                    for c in node.children:
+                        rebuild_parent_child_relationships(c, node)
+            rebuild_parent_child_relationships(self._virtual_dom)
         self.was_mounted()
 
     def get_root(self):
@@ -379,6 +396,9 @@ class VNode(object):
     def get_tag_name(self):
         # Returns the tag name, can be overridden in subclasses for dynamic behaviour
         return lazy_eval(self.tag_name)
+
+    def __str__(self):
+        return str(type(self)) + ' ' + self.get_tag_name()
 
 
 c = VNode
