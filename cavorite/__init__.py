@@ -326,6 +326,7 @@ class VNode(object):
                 child.was_mounted()
 
     def mount(self, element):
+        #print("mount called")
         # Output the DOM into the passed element
         assert self.parent is None, 'You can only mount the root node'
         self._virtual_dom = self._build_virtual_dom()
@@ -374,12 +375,15 @@ class VNode(object):
         virtual_dom2 = self._build_virtual_dom()
         elements_to_change = self._virtual_dom._get_dom_changes(virtual_dom2)
         assert isinstance(elements_to_change, list)
-        #print('mount_redraw elements_to_change=', elements_to_change)
+        #print('mount_redraw self._virtual_dom=', len(self._virtual_dom.children), ', virtual_dom2=', len(virtual_dom2.children))
         #print('mount_redraw elements_to_change=', [(str(live_vnode), str(new_vnode), live_vnode.parent is None) for (live_vnode, new_vnode) in elements_to_change])
         if any([live_vnode.parent is None for (live_vnode, new_vnode) in elements_to_change]): # Temporaily force full redraws
             #print('mount_redraw redrawing all forced')
             # If the root node has changed just redraw everything the rest of our logic in irrelevant
-            self.render(self.mounted_element)
+            #self.render(self.mounted_element)
+            self._virtual_dom = virtual_dom2
+            self._virtual_dom = self._build_virtual_dom()
+            self._virtual_dom.render(self.mounted_element)
             self.attach_script_nodes(self.mounted_element)
         else:
             #print('mount_redraw redrawing individual elements num elements=', len(elements_to_change))
