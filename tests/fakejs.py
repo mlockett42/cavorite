@@ -19,7 +19,7 @@ class MockJSList(object):
 
     def remove(self, e):
         self.l.remove(e)
-    
+
 
 class MockElement(object):
     def __init__(self):
@@ -83,12 +83,18 @@ return_get_element_by_id = None
 def getElementById(id):
     return return_get_element_by_id[id]
 
+return_get_elements_by_class_name = None
+
+def getElementsByClassName(class_name):
+    return return_get_elements_by_class_name[class_name]
+
 body = MockElement()
 
-document = Mock(createElement=createElement, 
-                createElementNS=createElementNS, 
-                createTextNode=createTextNode, 
+document = Mock(createElement=createElement,
+                createElementNS=createElementNS,
+                createTextNode=createTextNode,
                 getElementById=getElementById,
+                getElementsByClassName=getElementsByClassName,
                 body=body)
 
 window = Mock()
@@ -106,5 +112,3 @@ def IterateElements(node, callback):
     callback(node)
     for child in node.children.l:
         IterateElements(child, callback)
-
-
