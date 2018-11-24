@@ -110,7 +110,7 @@ class TestAttribs(object):
         value = 'hello'
         rendered_node = node._render(None)
         assert rendered_node.getAttribute('class') == 'hello'
-        
+
         value = 'world'
         rendered_node = node._render(None)
         assert rendered_node.getAttribute('class') == 'world'
@@ -145,13 +145,13 @@ def validate_uuid4(uuid_string):
     try:
         val = uuid.UUID(uuid_string, version=4)
     except ValueError:
-        # If it's a value error, then the string 
+        # If it's a value error, then the string
         # is not a valid hex code for a UUID.
         return False
 
-    # If the uuid_string is a valid hex code, 
+    # If the uuid_string is a valid hex code,
     # but an invalid uuid4,
-    # the UUID.__init__ will convert it to a 
+    # the UUID.__init__ will convert it to a
     # valid uuid4. This is bad for validation purposes.
 
     return val.hex == uuid_string
@@ -202,7 +202,7 @@ class TestCallables(object):
         assert rendered_node.onmouseover != dummy_callback, 'We need to actually wrap that function'
         assert rendered_node.onmouseup.is_fake_js_func, 'Check is a function wrapped by js.Function'
         assert rendered_node.onmouseup != dummy_callback, 'We need to actually wrap that function'
-        
+
     def test_click_routing(self, monkeypatch):
         monkeypatch.setattr(cavorite.cavorite, 'js', js)
         monkeypatch.setattr(callbacks, 'js', js)
@@ -288,7 +288,7 @@ class TestMockElementIteration(object):
                     d['p_google'] += 1
             if isinstance(node, js.MockTextNode) and str(node) == 'Google':
                 d['t_google'] += 1
-        
+
         node = c("div", [
                  c("a", {'href': 'https://google.com/'}, [
                    c("p", "Google"),
@@ -308,7 +308,7 @@ class TestMockElementIteration(object):
 class TestDiffingElements(object):
     def test_cavorite_id_changes_dont_cause_redraws(self):
         # Don't report that the DOM changed if the cavorite ID is the only thing that changed
-        
+
         class GoogleLink(a):
             def __init__(self):
                 super(GoogleLink, self).__init__({'href': 'https://google.com/'}, None)
@@ -326,14 +326,14 @@ class TestDiffingElements(object):
 
         # Because we create a new p element in the GoogleLink's get_children function It's _cavorite_id will change
         virtual_dom2 = node._build_virtual_dom()
-        
+
         assert len(list(node._virtual_dom._get_dom_changes(virtual_dom2))) == 0
 
     def test_other_node_changes_do_cause_redraws(self):
         # Don't report that the DOM changed if the cavorite ID is the only thing that changed
 
         theclass = 'Red'
-        
+
         class GoogleLink(a):
             def __init__(self):
                 super(GoogleLink, self).__init__({'href': 'https://google.com/'}, None)
@@ -353,9 +353,70 @@ class TestDiffingElements(object):
 
         # Because we the class comes from out of scope variable theclass the node should redraw
         virtual_dom2 = node._build_virtual_dom()
-        
+
         assert len(list(node._virtual_dom._get_dom_changes(virtual_dom2))) == 1
 
+    def test_event_handler_functions_in_attribs_dont_cause_changes(self):
+        # Don't report that the DOM changed if the cavorite ID is the only thing that changed
+
+        def handle_click1(e):
+            pass
+
+        def handle_click2(e):
+            pass
+
+        click_fn = handle_click1
+
+        class GoogleLink(a):
+            def __init__(self):
+                super(GoogleLink, self).__init__({'href': 'https://google.com/'}, None)
+
+            def get_children(self):
+                return [
+                   c("p", {'class': 'Red', 'onclick':click_fn}, "Google"),
+                 ]
+
+        node = c("div", [
+                 GoogleLink(),
+               ])
+
+        node._virtual_dom = node._build_virtual_dom()
+        click_fn = handle_click2
+
+        # Because we the class comes from out of scope variable theclass the node should redraw
+        virtual_dom2 = node._build_virtual_dom()
+
+        assert len(list(node._virtual_dom._get_dom_changes(virtual_dom2))) == 0
+
+    def test_node_value_which_are_functions(self):
+        # Don't report that the DOM changed if the cavorite ID is the only thing that changed
+
+        theclass = 'Red'
+
+        def class_fn():
+            return theclass
+
+        class GoogleLink(a):
+            def __init__(self):
+                super(GoogleLink, self).__init__({'href': 'https://google.com/'}, None)
+
+            def get_children(self):
+                return [
+                   c("p", {'class': class_fn}, "Google"),
+                 ]
+
+        node = c("div", [
+                 GoogleLink(),
+               ])
+
+        node._virtual_dom = node._build_virtual_dom()
+
+        theclass = 'Blue'
+
+        # Because we the class comes from out of scope variable theclass the node should redraw
+        virtual_dom2 = node._build_virtual_dom()
+
+        assert len(list(node._virtual_dom._get_dom_changes(virtual_dom2))) == 1
     """
     This test commented out because currently incorrect. Mount_redraw is redrawing the entire
     DOM in many situations to shouldn't this test is part of a failed attempt to fix this
@@ -365,7 +426,7 @@ class TestDiffingElements(object):
         # Don't report that the DOM changed if the cavorite ID is the only thing that changed
 
         theclass = 'Red'
-        
+
         class GoogleLink(a):
             def __init__(self):
                 super(GoogleLink, self).__init__(None, None)
@@ -391,7 +452,7 @@ class TestDiffingElements(object):
 
         # Because we the class comes from out of scope variable theclass the node should redraw
         virtual_dom2 = node._build_virtual_dom()
-        
+
         #assert len(list(node._virtual_dom._get_dom_changes(virtual_dom2))) == 1
         assert node.was_mounted.call_count == 0
         print('test_nvode node=', node)
@@ -405,7 +466,7 @@ class TestTagNameIsCallable(object):
     def test_tag_name_is_called(self, monkeypatch):
         monkeypatch.setattr(cavorite.cavorite, 'js', js)
         node = c("div")
-        
+
         monkeypatch.setattr(node, 'get_tag_name', Mock())
         rendered_node = node._render(None)
         assert node.get_tag_name.call_count == 1
@@ -422,7 +483,7 @@ class TestTagNameIsCallable(object):
 
 class TestProxy(object):
     def test_proxy_to_subclass(self):
-        proxy_mode = None       
+        proxy_mode = None
 
         class TestProxy(SimpleProxy):
             def get_proxy(self):
@@ -495,6 +556,3 @@ class TestModalProxy(object):
         child = proxy.get_children()[0]
         assert isinstance(child, t)
         assert child.text == 'Hello world'
-
-        
-

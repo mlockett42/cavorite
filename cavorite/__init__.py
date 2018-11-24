@@ -18,6 +18,12 @@ def lazy_eval(v):
         return v
 
 
+def merge_dicts(d1, d2):
+    ret = copy.copy(d1)
+    ret.update(d2)
+    return ret
+
+
 class TextNode(object):
     # When rendered this adds a textnode to the DOM
     def __init__(self, text):
@@ -156,8 +162,14 @@ class VNode(object):
         return new_element
 
     def _build_virtual_dom(self):
+        def proccess_attribs(attribs):
+            # We want to evaluate all attributes which have function values but that excludes the event handler functions obvouisly
+            ret1 = {k:lazy_eval(v) for k,v in attribs.items() if k not in callbacks.supported_callback_names}
+            ret2 = {k:v for k,v in attribs.items() if k in callbacks.supported_callback_names}
+            return merge_dicts(ret1, ret2)
+
         # Build a copy of the Virtual DOM but render each tag as it's based HTML tag
-        clone = VNode(self.get_tag_name(), copy.copy(self.get_attribs()))
+        clone = VNode(self.get_tag_name(), proccess_attribs(self.get_attribs()))
         clone.original = self
         for child in self.get_children():
             clone.children.append(child._build_virtual_dom())
@@ -323,12 +335,20 @@ class VNode(object):
         self.was_mounted()
 
     def _get_dom_changes(self, virtual_dom2):
+        def _process_attribs(attribs):
+            # Process the arribs dictionary before diffing
+            return {k:v for k,v in attribs.items() if k not in callbacks.supported_callback_names and k != '_cavorite_id'}
+
         # Compare the rendered current DOM to a virtual DOM copy. This is how we
         # ddetermine what has change and what needs to be re-rendered
+        """
         attribs1 = copy.copy(self.attribs)
         del attribs1['_cavorite_id']
         attribs2 = copy.copy(virtual_dom2.attribs)
         del attribs2['_cavorite_id']
+        """
+        attribs1 = _process_attribs(self.attribs)
+        attribs2 = _process_attribs(virtual_dom2.attribs)
         #print('_get_dom_changes self=', self)
         #print('_get_dom_changes self.get_tag_name()=', self.get_tag_name(), ',virtual_dom2.get_tag_name()=', virtual_dom2.get_tag_name())
         #print('_get_dom_changes self.get_tag_name()=', self.get_tag_name(), ',virtual_dom2.get_tag_name()=', virtual_dom2.get_tag_name())
@@ -362,7 +382,7 @@ class VNode(object):
             self.render(self.mounted_element)
             self.attach_script_nodes(self.mounted_element)
         else:
-            print('mount_redraw redrawing individual elements num elements=', len(elements_to_change))
+            #print('mount_redraw redrawing individual elements num elements=', len(elements_to_change))
             for (live_vnode, new_vnode) in elements_to_change:
                 live_parent = live_vnode.parent
                 new_element = new_vnode._render(live_parent)
