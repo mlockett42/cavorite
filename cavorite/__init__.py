@@ -46,7 +46,7 @@ class TextNode(object):
     def _get_dom_changes(self, virtual_dom2):
         # Determine if the DOMs are different if yes return this one
         if self.text != virtual_dom2.text:
-            return [(self, virtual_dom2)]
+            return [(self, virtual_dom2, False)]
         else:
             return []
 
@@ -359,16 +359,37 @@ class VNode(object):
         #    print('_get_dom_changes found svg tag')
         #    print('_get_dom_changes attribs1=', attribs1,' attribs2=', attribs2)
         #    print('_get_dom_changes len(self.children)=', len(self.children), ', len(virtual_dom2.children)=', len(virtual_dom2.children))
-        if self.get_tag_name() != virtual_dom2.get_tag_name() or attribs1 != attribs2 or \
+        if self.get_tag_name() != virtual_dom2.get_tag_name() or \
             len(self.children) != len(virtual_dom2.children):
-                return [(self, virtual_dom2)]
-        r = [self.children[i]._get_dom_changes(virtual_dom2.children[i]) for i in range(len(self.children))]
+                return [(self, virtual_dom2, False)]
+        r = []
+        if attribs1 != attribs2:
+                r = [[(self, virtual_dom2, True)]]
+        r = r + [self.children[i]._get_dom_changes(virtual_dom2.children[i]) for i in range(len(self.children))]
         #print('_get_dom_changes r=', r)
         ret = list(itertools.chain.from_iterable(r))
         #if len(ret) > 0:
         #    print('_get_dom_changes ret=', [str(live_vnode) for  live_vnode, new_vnode in ret])
         #    print('_get_dom_changes len(ret)=', len(ret))
         return ret
+
+    def _update_attribs(self, new_attribs):
+        keys_to_delete = set(self.attribs.keys()) - set(new_attribs.keys())
+        for k in keys_to_delete:
+            self.dom_element.removeAttribute(k)
+
+        for k,v in new_attribs.items():
+            if k in callbacks.global_callback_handlers:
+                callbacks.global_callbacks[k][self.attribs['_cavorite_id']] = v
+                setattr(self.dom_element,k, callbacks.global_callback_handlers[k])
+                #pass
+            else:
+                #print("_update_attribs k=", k, ",v=", v)
+                if k != "_cavorite_id" and (k not in self.attribs or self.attribs[k] != v):
+                    #print("Reset attrib k=", k)
+                    self.dom_element.setAttribute(k, lazy_eval(v))
+
+        self.attribs = new_attribs
 
     def mount_redraw(self):
         # Redraw the view. This will determine which DOM elements have changed and redraw them
@@ -377,7 +398,7 @@ class VNode(object):
         assert isinstance(elements_to_change, list)
         #print('mount_redraw self._virtual_dom=', len(self._virtual_dom.children), ', virtual_dom2=', len(virtual_dom2.children))
         #print('mount_redraw elements_to_change=', [(str(live_vnode), str(new_vnode), live_vnode.parent is None) for (live_vnode, new_vnode) in elements_to_change])
-        if any([live_vnode.parent is None for (live_vnode, new_vnode) in elements_to_change]): # Temporaily force full redraws
+        if any([live_vnode.parent is None for (live_vnode, new_vnode, attrib_only) in elements_to_change]): # Temporaily force full redraws
             #print('mount_redraw redrawing all forced')
             # If the root node has changed just redraw everything the rest of our logic in irrelevant
             #self.render(self.mounted_element)
@@ -387,12 +408,15 @@ class VNode(object):
             self.attach_script_nodes(self.mounted_element)
         else:
             #print('mount_redraw redrawing individual elements num elements=', len(elements_to_change))
-            for (live_vnode, new_vnode) in elements_to_change:
-                live_parent = live_vnode.parent
-                new_element = new_vnode._render(live_parent)
-                i = live_parent.children.index(live_vnode)
-                live_parent.children[i] = new_vnode
-                live_vnode.dom_element.replaceWith(new_vnode.dom_element)
+            for (live_vnode, new_vnode, attrib_only) in elements_to_change:
+                if attrib_only:
+                    live_vnode._update_attribs(new_vnode.attribs)
+                else:
+                    live_parent = live_vnode.parent
+                    new_element = new_vnode._render(live_parent)
+                    i = live_parent.children.index(live_vnode)
+                    live_parent.children[i] = new_vnode
+                    live_vnode.dom_element.replaceWith(new_vnode.dom_element)
             def rebuild_parent_child_relationships(node, parent=None):
                 node.parent = parent
                 if hasattr(node, 'children'):

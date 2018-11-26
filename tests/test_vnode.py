@@ -329,7 +329,7 @@ class TestDiffingElements(object):
 
         assert len(list(node._virtual_dom._get_dom_changes(virtual_dom2))) == 0
 
-    def test_other_node_changes_do_cause_redraws(self):
+    def test_other_node_changes_do_cause_redraws_with_attrib_update(self):
         # Don't report that the DOM changed if the cavorite ID is the only thing that changed
 
         theclass = 'Red'
@@ -354,7 +354,38 @@ class TestDiffingElements(object):
         # Because we the class comes from out of scope variable theclass the node should redraw
         virtual_dom2 = node._build_virtual_dom()
 
-        assert len(list(node._virtual_dom._get_dom_changes(virtual_dom2))) == 1
+        dom_changes = list(node._virtual_dom._get_dom_changes(virtual_dom2))
+        assert len(dom_changes) == 1
+        assert dom_changes[0][2] == True
+
+    def test_other_node_changes_do_cause_redraws_with_tag_name(self):
+        # Don't report that the DOM changed if the cavorite ID is the only thing that changed
+
+        thetag = 'p'
+
+        class GoogleLink(a):
+            def __init__(self):
+                super(GoogleLink, self).__init__({'href': 'https://google.com/'}, None)
+
+            def get_children(self):
+                return [
+                   c(thetag, {'class': 'Red'}, "Google"),
+                 ]
+
+        node = c("div", [
+                 GoogleLink(),
+               ])
+
+        node._virtual_dom = node._build_virtual_dom()
+
+        thetag = 'strong'
+
+        # Because we the class comes from out of scope variable theclass the node should redraw
+        virtual_dom2 = node._build_virtual_dom()
+
+        dom_changes = list(node._virtual_dom._get_dom_changes(virtual_dom2))
+        assert len(dom_changes) == 1
+        assert dom_changes[0][2] == False
 
     def test_event_handler_functions_in_attribs_dont_cause_changes(self):
         # Don't report that the DOM changed if the cavorite ID is the only thing that changed
@@ -416,7 +447,9 @@ class TestDiffingElements(object):
         # Because we the class comes from out of scope variable theclass the node should redraw
         virtual_dom2 = node._build_virtual_dom()
 
-        assert len(list(node._virtual_dom._get_dom_changes(virtual_dom2))) == 1
+        dom_changes = list(node._virtual_dom._get_dom_changes(virtual_dom2))
+        assert len(dom_changes) == 1
+        assert dom_changes[0][2] == True
     """
     This test commented out because currently incorrect. Mount_redraw is redrawing the entire
     DOM in many situations to shouldn't this test is part of a failed attempt to fix this
