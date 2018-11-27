@@ -380,9 +380,9 @@ class VNode(object):
 
         for k,v in new_attribs.items():
             if k in callbacks.global_callback_handlers:
-                callbacks.global_callbacks[k][self.attribs['_cavorite_id']] = v
-                setattr(self.dom_element,k, callbacks.global_callback_handlers[k])
-                #pass
+                #callbacks.global_callbacks[k][self.attribs['_cavorite_id']] = v
+                #setattr(self.dom_element,k, callbacks.global_callback_handlers[k])
+                pass
             else:
                 #print("_update_attribs k=", k, ",v=", v)
                 if k != "_cavorite_id" and (k not in self.attribs or self.attribs[k] != v):
