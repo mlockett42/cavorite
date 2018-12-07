@@ -400,7 +400,7 @@ class VNode(object):
         assert isinstance(elements_to_change, list)
         #print('mount_redraw self._virtual_dom=', len(self._virtual_dom.children), ', virtual_dom2=', len(virtual_dom2.children))
         #print('mount_redraw elements_to_change=', [(str(live_vnode), str(new_vnode), live_vnode.parent is None) for (live_vnode, new_vnode) in elements_to_change])
-        print('Mount_redraw force_redraw_all=', force_redraw_all)
+        #print('Mount_redraw force_redraw_all=', force_redraw_all)
         if force_redraw_all or any([live_vnode.parent is None for (live_vnode, new_vnode, attrib_only) in elements_to_change]): # Temporaily force full redraws
             #print('mount_redraw redrawing all forced')
             # If the root node has changed just redraw everything the rest of our logic in irrelevant
