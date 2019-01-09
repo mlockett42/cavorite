@@ -100,7 +100,7 @@ document = Mock(createElement=createElement,
                 getElementsByClassName=getElementsByClassName,
                 body=body)
 
-window = Mock()
+window = MagicMock(innerHeight=800)
 
 globals = MagicMock(document=document, window=window)
 
@@ -115,3 +115,5 @@ def IterateElements(node, callback):
     callback(node)
     for child in node.children.l:
         IterateElements(child, callback)
+
+null = None
