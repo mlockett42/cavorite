@@ -92,11 +92,14 @@ def clear_timeout(val):
 
     js.globals.clearTimeout(val)
 
-    function_id = global_timeout_val_to_id[val]
+    if val in global_timeout_val_to_id:
+        # Sometimes we appear to can called the clear a timeout that someone
+        # has already cleared
+        function_id = global_timeout_val_to_id[val]
 
-    del global_timeout_val_to_id[val]
-    del global_timeout_id_to_val[function_id]
-    del global_timeout_callbacks[function_id]
+        del global_timeout_val_to_id[val]
+        del global_timeout_id_to_val[function_id]
+        del global_timeout_callbacks[function_id]
 
 def set_interval(handler_fn, delay):
     global global_interval_callbacks
@@ -121,8 +124,11 @@ def clear_interval(val):
 
     js.globals.clearInterval(val)
 
-    function_id = global_interval_val_to_id[val]
+    if val in global_interval_val_to_id:
+        # Sometimes we appear to can called the clear a timeout that someone
+        # has already cleared
+        function_id = global_interval_val_to_id[val]
 
-    del global_interval_val_to_id[val]
-    del global_interval_id_to_val[function_id]
-    del global_interval_callbacks[function_id]
+        del global_interval_val_to_id[val]
+        del global_interval_id_to_val[function_id]
+        del global_interval_callbacks[function_id]
