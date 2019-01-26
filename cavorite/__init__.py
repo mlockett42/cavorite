@@ -444,6 +444,18 @@ class VNode(object):
         # the last move
         pass
 
+    def on_body_keyup(self, e):
+        # Called by the router whenever a keyup event is received
+        pass
+
+    def on_body_keydown(self, e):
+        # Called by the router whenever a keydown event is received
+        pass
+
+    def on_body_keypress(self, e):
+        # Called by the router whenever a keypress event is received
+        pass
+
     def get_tag_name(self):
         # Returns the tag name, can be overridden in subclasses for dynamic behaviour
         return lazy_eval(self.tag_name)
@@ -487,6 +499,9 @@ class ModalProxy(SimpleProxy):
 global_router_on_body_mousemove = None
 global_router_on_hash_change = None
 global_router_on_body_click = None
+global_router_on_body_keydown = None
+global_router_on_body_keyup = None
+global_router_on_body_keypress = None
 
 def initialise_global_router_callbacks():
 
@@ -514,6 +529,30 @@ def initialise_global_router_callbacks():
     global global_router_on_body_click
     global_router_on_body_click = router_on_body_click
 
+    @js.Function
+    @output_exceptions
+    def router_on_body_keydown(e):
+        if Router.router:
+            Router.router.on_body_keydown(e)
+    global global_router_on_body_keydown
+    global_router_on_body_keydown = router_on_body_keydown
+
+    @js.Function
+    @output_exceptions
+    def router_on_body_keyup(e):
+        if Router.router:
+            Router.router.on_body_keyup(e)
+    global global_router_on_body_keyup
+    global_router_on_body_keyup = router_on_body_keyup
+
+    @js.Function
+    @output_exceptions
+    def router_on_body_keypress(e):
+        if Router.router:
+            Router.router.on_body_keypress(e)
+    global global_router_on_body_keypress
+    global_router_on_body_keypress = router_on_body_keypress
+
 
 class Router(object):
     # A router handles if we want a SPA. All this means is that a different view is selected into
@@ -536,6 +575,9 @@ class Router(object):
         self.on_body_mousemove_js_function = global_router_on_body_mousemove
         self.global_mouse_x = 0
         self.global_mouse_y = 0
+        js.globals.document.onkeyup = global_router_on_body_keyup
+        js.globals.document.onkeydown = global_router_on_body_keydown
+        js.globals.document.onkeypress = global_router_on_body_keypress
 
     def get_selected_route(self):
         # Returns the selected route and the url_kwargs as a tuple. This is
@@ -589,6 +631,15 @@ class Router(object):
                                               e.clientY - self.global_mouse_y)
         self.global_mouse_x = e.clientX
         self.global_mouse_y = e.clientY
+
+    def on_body_keydown(self, e):
+        self.selected_route.on_body_keydown(e)
+
+    def on_body_keyup(self, e):
+        self.selected_route.on_body_keyup(e)
+
+    def on_body_keypress(self, e):
+        self.selected_route.on_body_keypress(e)
 
 def get_current_hash():
     return str(js.globals.window.location.hash)

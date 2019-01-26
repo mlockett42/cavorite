@@ -12,7 +12,8 @@ global_callbacks = None
 supported_callback_names = {'onclick', 'onchange', 'oncontextmenu',
                             'ondblclick', 'onmousedown', 'onmouseenter',
                             'onmouseleave', 'onmousemove', 'onmouseover',
-                            'onmouseup', 'onsubmit',
+                            'onmouseup', 'onsubmit', 'onkeyup', 'onkeydown',
+                            'onkeypress'
                             }
 
 global_callback_handlers = { k: None for k in supported_callback_names }
@@ -147,3 +148,36 @@ def initialise_global_callbacks():
         if cavorite_id in callbacks and callbacks[cavorite_id] is not None:
             callbacks[cavorite_id](e)
     global_callback_handlers['onsubmit'] = local_onsubmit_handler
+
+    @js.Function
+    @output_exceptions
+    def local_onkeydown_handler(e):
+        global global_callbacks
+        callbacks = global_callbacks['onkeydown']
+        target = e.target
+        cavorite_id = str(target.getAttribute('_cavorite_id'))
+        if cavorite_id in callbacks and callbacks[cavorite_id] is not None:
+            callbacks[cavorite_id](e)
+    global_callback_handlers['onkeydown'] = local_onsubmit_handler
+
+    @js.Function
+    @output_exceptions
+    def local_onkeydown_handler(e):
+        global global_callbacks
+        callbacks = global_callbacks['onkeyup']
+        target = e.target
+        cavorite_id = str(target.getAttribute('_cavorite_id'))
+        if cavorite_id in callbacks and callbacks[cavorite_id] is not None:
+            callbacks[cavorite_id](e)
+    global_callback_handlers['onkeyup'] = local_onsubmit_handler
+
+    @js.Function
+    @output_exceptions
+    def local_onkeydown_handler(e):
+        global global_callbacks
+        callbacks = global_callbacks['onkeypress']
+        target = e.target
+        cavorite_id = str(target.getAttribute('_cavorite_id'))
+        if cavorite_id in callbacks and callbacks[cavorite_id] is not None:
+            callbacks[cavorite_id](e)
+    global_callback_handlers['onkeypress'] = local_onsubmit_handler

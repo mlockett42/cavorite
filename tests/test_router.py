@@ -45,6 +45,15 @@ class TestRouter(object):
         welcome_page.on_body_mousemove = Mock()
         hello_page.on_body_mousemove = Mock()
 
+        welcome_page.on_body_keyup = Mock()
+        hello_page.on_body_keyup = Mock()
+
+        welcome_page.on_body_keydown = Mock()
+        hello_page.on_body_keydown = Mock()
+
+        welcome_page.on_body_keypress = Mock()
+        hello_page.on_body_keypress = Mock()
+
         error_404_page = c("div", [c("p", "No match 404 error"),
                                    c("p", [c("a", {"href": "/#!"}, "Back to main page")])])
 
@@ -59,14 +68,32 @@ class TestRouter(object):
 
         hello_page.on_body_click.assert_not_called()
 
-        
         r.on_body_mousemove(Mock(clientX=500, clientY=510))
 
         welcome_page.on_body_mousemove.assert_called()
 
         hello_page.on_body_mousemove.assert_not_called()
 
-    def test_router_handles_global_mouse_moves(self, monkeypatch):
+        r.on_body_keyup(Mock())
+
+        welcome_page.on_body_keyup.assert_called()
+
+        hello_page.on_body_keyup.assert_not_called()
+
+        r.on_body_keydown(Mock())
+
+        welcome_page.on_body_keydown.assert_called()
+
+        hello_page.on_body_keydown.assert_not_called()
+
+        r.on_body_keypress(Mock())
+
+        welcome_page.on_body_keypress.assert_called()
+
+        hello_page.on_body_keypress.assert_not_called()
+
+
+    def test_router_handles_global_mousemove(self, monkeypatch):
         monkeypatch.setattr(cavorite.cavorite, 'js', js)
 
         body = js.globals.document.body
@@ -134,5 +161,3 @@ class TestRouter(object):
         p1 = div1.children.item(0)
         assert p1.children.length == 1
         assert str(p1.children.item(0)) == 'd8fb8497-fb86-4dea-bd9c-49ad883b7a84'
-
-
