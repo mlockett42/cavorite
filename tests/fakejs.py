@@ -5,7 +5,7 @@ from mock import Mock, MagicMock
 class MockJSList(object):
     # Simulates a list in javascript
     def __init__(self):
-        self.l = list()
+        self.l = []
 
     @property
     def length(self):
@@ -19,6 +19,18 @@ class MockJSList(object):
 
     def remove(self, e):
         self.l.remove(e)
+
+class MockJSArray(object):
+    # Simulates a list in javascript
+    def __init__(self, l=list()):
+        self.l = l
+
+    @property
+    def length(self):
+        return len(self.l)
+
+    def __getitem__(self,index):
+        return self.l[index]
 
 
 class MockElement(object):

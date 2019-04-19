@@ -646,3 +646,12 @@ def get_current_hash():
 
 def get_uuid():
     return uuid.uuid4()
+
+def js_list_to_py_list(js_list):
+    # TODO: Add unit tests for this function
+    # Convert a JS/DOM list into a Python list. Python lists can be iterated
+    # over much more easily
+    ret = []
+    for i in range(js_list.length):
+        ret.append(str(js_list[i]))
+    return ret
