@@ -78,13 +78,13 @@ class VNode(object):
             self.attribs = attribs
             if isinstance(children, list) or callable(children):
                 self.children = children
-            if isinstance(children, basestring):
+            if isinstance(children, str):
                 self.children = [TextNode(children)]
         if attribs is None and children is not None:
             self.attribs = { }
             if isinstance(children, list) or callable(children):
                 self.children = children
-            if isinstance(children, basestring):
+            if isinstance(children, str):
                 self.children = [TextNode(children)]
         if attribs is not None and children is None:
             # If the first argument after the tag is a list or string it is actually the children
@@ -92,7 +92,7 @@ class VNode(object):
                 self.attribs = attribs
             if isinstance(attribs, list):
                 self.children = attribs
-            if isinstance(attribs, basestring):
+            if isinstance(attribs, str):
                 self.children = [TextNode(attribs)]
         if cssClass is not None:
             assert 'class' not in self.attribs, 'Cannot define css class twice'
