@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals, print_function
-import cavorite.cavorite
+import cavorite
 import tests.fakejs as js
-from cavorite.cavorite import callbacks
-from cavorite.cavorite import timeouts
+from cavorite import callbacks
+from cavorite import timeouts
 import uuid
-from cavorite.cavorite.HTML import *
+from cavorite.HTML import *
 
-c = cavorite.cavorite.c
-t = cavorite.cavorite.t
-Router = cavorite.cavorite.Router
+c = cavorite.c
+t = cavorite.t
+Router = cavorite.Router
 
 
 class TestMountListener(object):
     def test_mount_listener(self, monkeypatch):
-        monkeypatch.setattr(cavorite.cavorite, 'js', js)
+        monkeypatch.setattr(cavorite, 'js', js)
 
         counter = {'count': 0}
         def dummy_callback():

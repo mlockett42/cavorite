@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals, print_function
-from ..cavorite import c, t
-from ..cavorite.HTML import *
+from cavorite import c, t
+from cavorite.HTML import *
 import inspect
 import pytest
 
@@ -39,6 +39,3 @@ class TestTags(object):
         assert node.get_attribs()['class'] =='stuff'
         assert '_cavorite_id' in node.get_attribs()
         assert len(node.get_attribs()) == 2
-
-    
-

@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals, print_function
 import tests.fakejs as js
-import cavorite.cavorite
+import cavorite
 from mock import Mock
-from cavorite.cavorite.HTML import *
+from cavorite.HTML import *
 
-Router = cavorite.cavorite.Router
-c = cavorite.cavorite.c
-t = cavorite.cavorite.t
+Router = cavorite.Router
+c = cavorite.c
+t = cavorite.t
 
 
 class TestRouter(object):
     def test_router_stores_statically(self, monkeypatch):
-        monkeypatch.setattr(cavorite.cavorite, 'js', js)
+        monkeypatch.setattr(cavorite, 'js', js)
 
         body = js.globals.document.body
 
@@ -29,7 +29,7 @@ class TestRouter(object):
         assert Router.router == r
 
     def test_router_passes_body_clicks_to_view(self, monkeypatch):
-        monkeypatch.setattr(cavorite.cavorite, 'js', js)
+        monkeypatch.setattr(cavorite, 'js', js)
 
         body = js.globals.document.body
 
@@ -94,7 +94,7 @@ class TestRouter(object):
 
 
     def test_router_handles_global_mousemove(self, monkeypatch):
-        monkeypatch.setattr(cavorite.cavorite, 'js', js)
+        monkeypatch.setattr(cavorite, 'js', js)
 
         body = js.globals.document.body
 
@@ -135,7 +135,7 @@ class TestRouter(object):
             def get_children(self):
                 return [p(str(self.get_root().url_kwargs['project_id']))]
 
-        monkeypatch.setattr(cavorite.cavorite, 'js', js)
+        monkeypatch.setattr(cavorite, 'js', js)
 
         body = js.globals.document.body
 

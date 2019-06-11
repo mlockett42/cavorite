@@ -1,25 +1,25 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals, print_function
-import cavorite.cavorite
-import cavorite.cavorite.HTML
+import cavorite
+import cavorite.HTML
 import inspect
 import pytest
 from mock import Mock
-import cavorite.cavorite.bootstrap.modals
+import cavorite.bootstrap.modals
 import tests.fakejs as js
 
-div = cavorite.cavorite.HTML.div
-label = cavorite.cavorite.HTML.label
-html_input = cavorite.cavorite.HTML.html_input
-select = cavorite.cavorite.HTML.select
-option = cavorite.cavorite.HTML.option
+div = cavorite.HTML.div
+label = cavorite.HTML.label
+html_input = cavorite.HTML.html_input
+select = cavorite.HTML.select
+option = cavorite.HTML.option
 
-Modal = cavorite.cavorite.bootstrap.modals.Modal
+Modal = cavorite.bootstrap.modals.Modal
 
 class TestModals(object):
     def test_we_correctly_retreive_form_data(self, monkeypatch):
-        monkeypatch.setattr(cavorite.cavorite, 'js', js)
-        monkeypatch.setattr(cavorite.cavorite.bootstrap.modals, 'js', js)
+        monkeypatch.setattr(cavorite, 'js', js)
+        monkeypatch.setattr(cavorite.bootstrap.modals, 'js', js)
         onclick = Mock()
 
         m =   Modal("createNew", "Create New", [
@@ -40,7 +40,7 @@ class TestModals(object):
               ], onclick)
 
         rendered_modal = m._render(None)
-        cavorite.cavorite.bootstrap.modals.js.return_get_element_by_id = {'createNew': rendered_modal}
+        cavorite.bootstrap.modals.js.return_get_element_by_id = {'createNew': rendered_modal}
 
         result = dict()
 

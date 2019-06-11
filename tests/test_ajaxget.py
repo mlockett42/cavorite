@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals, print_function
-import cavorite.cavorite
+import cavorite
 import tests.fakejs as js
-from cavorite.cavorite import callbacks
-from cavorite.cavorite import timeouts
+from cavorite import callbacks
+from cavorite import timeouts
 import uuid
-from cavorite.cavorite.HTML import *
+from cavorite.HTML import *
 from mock import Mock
-from cavorite.cavorite import ajaxget
+from cavorite import ajaxget
 import pytest
 
-c = cavorite.cavorite.c
-t = cavorite.cavorite.t
-Router = cavorite.cavorite.Router
+c = cavorite.c
+t = cavorite.t
+Router = cavorite.Router
 
 # This file contains tests for the ajax get support
 # Note these tests cannot test the full functionality because they
@@ -25,7 +25,7 @@ class TestAjaxGetBehaviour(object):
         def dummy_uuid():
             return uuid.UUID('531cb169-91f4-4102-9a0a-2cd5e9659071')
 
-        monkeypatch.setattr(cavorite.cavorite, 'js', js)
+        monkeypatch.setattr(cavorite, 'js', js)
         monkeypatch.setattr(callbacks, 'js', js)
         monkeypatch.setattr(ajaxget, 'js', js)
         monkeypatch.setattr(ajaxget, 'get_uuid', dummy_uuid)
@@ -61,7 +61,7 @@ class TestAjaxPostBehaviour(object):
         def dummy_uuid():
             return uuid.UUID('531cb169-91f4-4102-9a0a-2cd5e9659071')
 
-        monkeypatch.setattr(cavorite.cavorite, 'js', js)
+        monkeypatch.setattr(cavorite, 'js', js)
         monkeypatch.setattr(callbacks, 'js', js)
         monkeypatch.setattr(ajaxget, 'js', js)
         monkeypatch.setattr(ajaxget, 'get_uuid', dummy_uuid)
@@ -98,7 +98,7 @@ class TestAjaxPutBehaviour(object):
         def dummy_uuid():
             return uuid.UUID('531cb169-91f4-4102-9a0a-2cd5e9659071')
 
-        monkeypatch.setattr(cavorite.cavorite, 'js', js)
+        monkeypatch.setattr(cavorite, 'js', js)
         monkeypatch.setattr(callbacks, 'js', js)
         monkeypatch.setattr(ajaxget, 'js', js)
         monkeypatch.setattr(ajaxget, 'get_uuid', dummy_uuid)
@@ -134,7 +134,7 @@ class TestAjaxDeleteBehaviour(object):
         def dummy_uuid():
             return uuid.UUID('531cb169-91f4-4102-9a0a-2cd5e9659071')
 
-        monkeypatch.setattr(cavorite.cavorite, 'js', js)
+        monkeypatch.setattr(cavorite, 'js', js)
         monkeypatch.setattr(callbacks, 'js', js)
         monkeypatch.setattr(ajaxget, 'js', js)
         monkeypatch.setattr(ajaxget, 'get_uuid', dummy_uuid)
@@ -175,7 +175,7 @@ class TestAjaxErrorHandlingBehaviour(object):
     def gen_request_errors_are_handled_correctly(self, monkeypatch, capsys,
                                                  ajax_fn, callback_fn):
 
-        monkeypatch.setattr(cavorite.cavorite, 'js', js)
+        monkeypatch.setattr(cavorite, 'js', js)
         monkeypatch.setattr(callbacks, 'js', js)
         monkeypatch.setattr(ajaxget, 'js', js)
         monkeypatch.setattr(ajaxget, 'get_uuid', self.dummy_uuid)

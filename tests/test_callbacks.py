@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals, print_function
-from cavorite.cavorite import callbacks
+from cavorite import callbacks
 from mock import Mock
 import tests.fakejs as js
 import pytest

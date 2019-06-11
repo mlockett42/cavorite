@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals, print_function
-import cavorite.cavorite
+import cavorite
 import tests.fakejs as js
-from cavorite.cavorite import callbacks
-from cavorite.cavorite import timeouts
+from cavorite import callbacks
+from cavorite import timeouts
 import uuid
-from cavorite.cavorite.HTML import *
+from cavorite.HTML import *
 import pytest
 
 
-c = cavorite.cavorite.c
-t = cavorite.cavorite.t
-Router = cavorite.cavorite.Router
+c = cavorite.c
+t = cavorite.t
+Router = cavorite.Router
 
 # This file contains tests for the setTimeout/ set Interval support
 # Note these tests cannot test the full functionality because they
@@ -20,7 +20,7 @@ Router = cavorite.cavorite.Router
 
 class TestTimeoutBehaviour(object):
     def test_script_tags_are_attached_to_body(self, monkeypatch):
-        monkeypatch.setattr(cavorite.cavorite, 'js', js)
+        monkeypatch.setattr(cavorite, 'js', js)
 
         defaulttext = t('Hello world')
         default_p = c('p', [defaulttext])
@@ -51,7 +51,7 @@ class TestTimeoutBehaviour(object):
         def dummy_uuid():
             return uuid.UUID('531cb169-91f4-4102-9a0a-2cd5e9659071')
 
-        monkeypatch.setattr(cavorite.cavorite, 'js', js)
+        monkeypatch.setattr(cavorite, 'js', js)
         monkeypatch.setattr(callbacks, 'js', js)
         monkeypatch.setattr(timeouts, 'js', js)
         monkeypatch.setattr(timeouts, 'get_uuid', dummy_uuid)
@@ -89,7 +89,7 @@ class TestTimeoutBehaviour(object):
         def dummy_uuid():
             return uuid.UUID('531cb169-91f4-4102-9a0a-2cd5e9659071')
 
-        monkeypatch.setattr(cavorite.cavorite, 'js', js)
+        monkeypatch.setattr(cavorite, 'js', js)
         monkeypatch.setattr(callbacks, 'js', js)
         monkeypatch.setattr(timeouts, 'js', js)
         monkeypatch.setattr(timeouts, 'get_uuid', dummy_uuid)
@@ -127,7 +127,7 @@ class TestTimeoutBehaviour(object):
         def dummy_uuid():
             return uuid.UUID('531cb169-91f4-4102-9a0a-2cd5e9659071')
 
-        monkeypatch.setattr(cavorite.cavorite, 'js', js)
+        monkeypatch.setattr(cavorite, 'js', js)
         monkeypatch.setattr(callbacks, 'js', js)
         monkeypatch.setattr(timeouts, 'js', js)
         monkeypatch.setattr(timeouts, 'get_uuid', dummy_uuid)
@@ -165,7 +165,7 @@ class TestTimeoutBehaviour(object):
         def dummy_uuid():
             return uuid.UUID('531cb169-91f4-4102-9a0a-2cd5e9659071')
 
-        monkeypatch.setattr(cavorite.cavorite, 'js', js)
+        monkeypatch.setattr(cavorite, 'js', js)
         monkeypatch.setattr(callbacks, 'js', js)
         monkeypatch.setattr(timeouts, 'js', js)
         monkeypatch.setattr(timeouts, 'get_uuid', dummy_uuid)
@@ -211,7 +211,7 @@ class TestTimeoutErrorBehaviour(object):
         def dummy_uuid():
             return uuid.UUID('531cb169-91f4-4102-9a0a-2cd5e9659071')
 
-        monkeypatch.setattr(cavorite.cavorite, 'js', js)
+        monkeypatch.setattr(cavorite, 'js', js)
         monkeypatch.setattr(callbacks, 'js', js)
         monkeypatch.setattr(timeouts, 'js', js)
         monkeypatch.setattr(timeouts, 'get_uuid', dummy_uuid)
@@ -238,7 +238,7 @@ class TestTimeoutErrorBehaviour(object):
         def dummy_uuid():
             return uuid.UUID('531cb169-91f4-4102-9a0a-2cd5e9659071')
 
-        monkeypatch.setattr(cavorite.cavorite, 'js', js)
+        monkeypatch.setattr(cavorite, 'js', js)
         monkeypatch.setattr(callbacks, 'js', js)
         monkeypatch.setattr(timeouts, 'js', js)
         monkeypatch.setattr(timeouts, 'get_uuid', dummy_uuid)

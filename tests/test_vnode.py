@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals, print_function
-import cavorite.cavorite
-from cavorite.cavorite import callbacks
+import cavorite
+from cavorite import callbacks
 import sys
 import tests.fakejs as js
 import pytest
 import uuid
 from mock import Mock, patch
 from collections import defaultdict
-from cavorite.cavorite.HTML import *
+from cavorite.HTML import *
 
-c = cavorite.cavorite.c
-t = cavorite.cavorite.t
-SimpleProxy = cavorite.cavorite.SimpleProxy
-ModalProxy = cavorite.cavorite.ModalProxy
+c = cavorite.c
+t = cavorite.t
+SimpleProxy = cavorite.SimpleProxy
+ModalProxy = cavorite.ModalProxy
 
 
 class TestChildren(object):
@@ -102,7 +102,7 @@ class TestAttribs(object):
         assert len(node.get_attribs()) == 2
 
     def test_attribs_can_be_callables(self, monkeypatch):
-        monkeypatch.setattr(cavorite.cavorite, 'js', js)
+        monkeypatch.setattr(cavorite, 'js', js)
         def class_callback():
             return value
         node = c('div', {'class': class_callback})
@@ -158,7 +158,7 @@ def validate_uuid4(uuid_string):
 
 class TestNodeIDs(object):
     def test_valid_node_id(self, monkeypatch):
-        monkeypatch.setattr(cavorite.cavorite, 'js', js)
+        monkeypatch.setattr(cavorite, 'js', js)
         node = c("div")
         assert validate_uuid4(node.attribs['_cavorite_id'])
         rendered_node = node._render(None)
@@ -166,7 +166,7 @@ class TestNodeIDs(object):
 
 class TestCallables(object):
     def test_build_dom_makes_js_func(self, monkeypatch):
-        monkeypatch.setattr(cavorite.cavorite, 'js', js)
+        monkeypatch.setattr(cavorite, 'js', js)
         monkeypatch.setattr(callbacks, 'js', js)
         callbacks.initialise_global_callbacks()
         def dummy_callback():
@@ -213,7 +213,7 @@ class TestCallables(object):
         assert rendered_node.onkeypress != dummy_callback, 'We need to actually wrap that function'
 
     def test_click_routing(self, monkeypatch):
-        monkeypatch.setattr(cavorite.cavorite, 'js', js)
+        monkeypatch.setattr(cavorite, 'js', js)
         monkeypatch.setattr(callbacks, 'js', js)
         callbacks.initialise_global_callbacks()
         counter = {'counter': 0}
@@ -293,7 +293,7 @@ class TestVNodeCloning(object):
 
 class TestMockElementIteration(object):
     def test_mockelement_iteration(self, monkeypatch):
-        monkeypatch.setattr(cavorite.cavorite, 'js', js)
+        monkeypatch.setattr(cavorite, 'js', js)
 
         d = defaultdict(int)
 
@@ -518,7 +518,7 @@ class TestDiffingElements(object):
 
 class TestTagNameIsCallable(object):
     def test_tag_name_is_called(self, monkeypatch):
-        monkeypatch.setattr(cavorite.cavorite, 'js', js)
+        monkeypatch.setattr(cavorite, 'js', js)
         node = c("div")
 
         monkeypatch.setattr(node, 'get_tag_name', Mock())
@@ -526,12 +526,12 @@ class TestTagNameIsCallable(object):
         assert node.get_tag_name.call_count == 1
 
     def test_tag_name_returns_correct_result(self, monkeypatch):
-        monkeypatch.setattr(cavorite.cavorite, 'js', js)
+        monkeypatch.setattr(cavorite, 'js', js)
         node = c("div")
         assert node.get_tag_name() == 'div'
 
     def test_tag_name_can_be_lazily_evaluated(self, monkeypatch):
-        monkeypatch.setattr(cavorite.cavorite, 'js', js)
+        monkeypatch.setattr(cavorite, 'js', js)
         node = c(lambda: "div")
         assert node.get_tag_name() == 'div'
 
