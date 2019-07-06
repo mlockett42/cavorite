@@ -185,31 +185,18 @@ class TestCallables(object):
                          'onkeyup': dummy_callback,
                          'onkeypress': dummy_callback})
         rendered_node = node._render(None)
-        assert rendered_node.onclick.is_fake_js_func, 'Check is a function wrapped by js.Function'
         assert rendered_node.onclick != dummy_callback, 'We need to actually wrap that function'
-        assert rendered_node.onchange.is_fake_js_func, 'Check is a function wrapped by js.Function'
         assert rendered_node.onchange != dummy_callback, 'We need to actually wrap that function'
-        assert rendered_node.oncontextmenu.is_fake_js_func, 'Check is a function wrapped by js.Function'
         assert rendered_node.oncontextmenu != dummy_callback, 'We need to actually wrap that function'
-        assert rendered_node.ondblclick.is_fake_js_func, 'Check is a function wrapped by js.Function'
         assert rendered_node.ondblclick != dummy_callback, 'We need to actually wrap that function'
-        assert rendered_node.onmousedown.is_fake_js_func, 'Check is a function wrapped by js.Function'
         assert rendered_node.onmousedown != dummy_callback, 'We need to actually wrap that function'
-        assert rendered_node.onmouseenter.is_fake_js_func, 'Check is a function wrapped by js.Function'
         assert rendered_node.onmouseenter != dummy_callback, 'We need to actually wrap that function'
-        assert rendered_node.onmouseleave.is_fake_js_func, 'Check is a function wrapped by js.Function'
         assert rendered_node.onmouseleave != dummy_callback, 'We need to actually wrap that function'
-        assert rendered_node.onmousemove.is_fake_js_func, 'Check is a function wrapped by js.Function'
         assert rendered_node.onmousemove != dummy_callback, 'We need to actually wrap that function'
-        assert rendered_node.onmouseover.is_fake_js_func, 'Check is a function wrapped by js.Function'
         assert rendered_node.onmouseover != dummy_callback, 'We need to actually wrap that function'
-        assert rendered_node.onmouseup.is_fake_js_func, 'Check is a function wrapped by js.Function'
         assert rendered_node.onmouseup != dummy_callback, 'We need to actually wrap that function'
-        assert rendered_node.onkeyup.is_fake_js_func, 'Check is a function wrapped by js.Function'
         assert rendered_node.onkeyup != dummy_callback, 'We need to actually wrap that function'
-        assert rendered_node.onkeydown.is_fake_js_func, 'Check is a function wrapped by js.Function'
         assert rendered_node.onkeydown != dummy_callback, 'We need to actually wrap that function'
-        assert rendered_node.onkeypress.is_fake_js_func, 'Check is a function wrapped by js.Function'
         assert rendered_node.onkeypress != dummy_callback, 'We need to actually wrap that function'
 
     def test_click_routing(self, monkeypatch):

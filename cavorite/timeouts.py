@@ -34,7 +34,6 @@ def initialise_timeout_callbacks():
     global global_interval_id_to_val
     global_interval_id_to_val = dict()
 
-    @js.Function
     @output_exceptions
     def cavorite_timeouthandler(key):
         key = str(key)
@@ -54,7 +53,6 @@ def initialise_timeout_callbacks():
     global global_cavorite_timeouthandler
     global_cavorite_timeouthandler = cavorite_timeouthandler
 
-    @js.Function
     @output_exceptions
     def cavorite_intervalhandler(key):
         key = str(key)

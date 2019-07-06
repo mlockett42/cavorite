@@ -114,13 +114,6 @@ document = Mock(createElement=createElement,
 
 window = MagicMock(innerHeight=800)
 
-def Function(fn):
-    def wrapper(*args, **kwargs):
-        fn(*args, **kwargs)
-    wrapper.is_fake_js_func = True
-    return wrapper
-
-
 def IterateElements(node, callback):
     callback(node)
     for child in node.children.l:

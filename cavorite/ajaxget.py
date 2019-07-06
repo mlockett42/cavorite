@@ -23,7 +23,6 @@ def initialise_ajaxget_callbacks():
     global global_ajaxget_callbacks
     global_ajaxget_callbacks = dict()
 
-    @js.Function
     @output_exceptions
     def cavorite_ajaxgethandler(xmlhttp, key, response):
         key = str(key)
@@ -42,7 +41,6 @@ def initialise_ajaxget_callbacks():
     global global_ajaxpost_callbacks
     global_ajaxpost_callbacks = dict()
 
-    @js.Function
     @output_exceptions
     def cavorite_ajaxposthandler(xmlhttp, key, response):
         key = str(key)
@@ -61,7 +59,6 @@ def initialise_ajaxget_callbacks():
     global global_ajaxput_callbacks
     global_ajaxput_callbacks = dict()
 
-    @js.Function
     @output_exceptions
     def cavorite_ajaxputhandler(xmlhttp, key, response):
         key = str(key)
@@ -80,7 +77,6 @@ def initialise_ajaxget_callbacks():
     global global_ajaxdelete_callbacks
     global_ajaxdelete_callbacks = dict()
 
-    @js.Function
     @output_exceptions
     def cavorite_ajaxdeletehandler(xmlhttp, key, response):
         key = str(key)

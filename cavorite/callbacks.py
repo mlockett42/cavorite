@@ -25,7 +25,6 @@ def initialise_global_callbacks():
     global supported_callback_names
     global_callbacks = { k: dict() for k in supported_callback_names }
 
-    @js.Function
     @output_exceptions
     def local_onclick_handler(e):
         #print('local_onclick_handler called')
@@ -39,7 +38,6 @@ def initialise_global_callbacks():
     global global_callback_handlers
     global_callback_handlers['onclick'] = local_onclick_handler
 
-    @js.Function
     @output_exceptions
     def local_onchange_handler(e):
         global global_callbacks
@@ -50,7 +48,6 @@ def initialise_global_callbacks():
             callbacks[cavorite_id](e)
     global_callback_handlers['onchange'] = local_onchange_handler
 
-    @js.Function
     @output_exceptions
     def local_oncontextmenu_handler(e):
         global global_callbacks
@@ -61,7 +58,6 @@ def initialise_global_callbacks():
             callbacks[cavorite_id](e)
     global_callback_handlers['oncontextmenu'] = local_oncontextmenu_handler
 
-    @js.Function
     @output_exceptions
     def local_ondblclick_handler(e):
         global global_callbacks
@@ -72,7 +68,6 @@ def initialise_global_callbacks():
             callbacks[cavorite_id](e)
     global_callback_handlers['ondblclick'] = local_ondblclick_handler
 
-    @js.Function
     @output_exceptions
     def local_onmousedown_handler(e):
         global global_callbacks
@@ -83,7 +78,6 @@ def initialise_global_callbacks():
             callbacks[cavorite_id](e)
     global_callback_handlers['onmousedown'] = local_onmousedown_handler
 
-    @js.Function
     @output_exceptions
     def local_onmouseenter_handler(e):
         global global_callbacks
@@ -94,7 +88,6 @@ def initialise_global_callbacks():
             callbacks[cavorite_id](e)
     global_callback_handlers['onmouseenter'] = local_onmouseenter_handler
 
-    @js.Function
     @output_exceptions
     def local_onmouseleave_handler(e):
         global global_callbacks
@@ -105,7 +98,6 @@ def initialise_global_callbacks():
             callbacks[cavorite_id](e)
     global_callback_handlers['onmouseleave'] = local_onmouseleave_handler
 
-    @js.Function
     @output_exceptions
     def local_onmousemove_handler(e):
         global global_callbacks
@@ -116,7 +108,6 @@ def initialise_global_callbacks():
             callbacks[cavorite_id](e)
     global_callback_handlers['onmousemove'] = local_onmousemove_handler
 
-    @js.Function
     @output_exceptions
     def local_onmouseover_handler(e):
         global global_callbacks
@@ -127,7 +118,6 @@ def initialise_global_callbacks():
             callbacks[cavorite_id](e)
     global_callback_handlers['onmouseover'] = local_onmouseover_handler
 
-    @js.Function
     @output_exceptions
     def local_onmouseup_handler(e):
         global global_callbacks
@@ -138,7 +128,6 @@ def initialise_global_callbacks():
             callbacks[cavorite_id](e)
     global_callback_handlers['onmouseup'] = local_onmouseup_handler
 
-    @js.Function
     @output_exceptions
     def local_onsubmit_handler(e):
         global global_callbacks
@@ -149,7 +138,6 @@ def initialise_global_callbacks():
             callbacks[cavorite_id](e)
     global_callback_handlers['onsubmit'] = local_onsubmit_handler
 
-    @js.Function
     @output_exceptions
     def local_onkeydown_handler(e):
         global global_callbacks
@@ -160,7 +148,6 @@ def initialise_global_callbacks():
             callbacks[cavorite_id](e)
     global_callback_handlers['onkeydown'] = local_onsubmit_handler
 
-    @js.Function
     @output_exceptions
     def local_onkeydown_handler(e):
         global global_callbacks
@@ -171,7 +158,6 @@ def initialise_global_callbacks():
             callbacks[cavorite_id](e)
     global_callback_handlers['onkeyup'] = local_onsubmit_handler
 
-    @js.Function
     @output_exceptions
     def local_onkeydown_handler(e):
         global global_callbacks

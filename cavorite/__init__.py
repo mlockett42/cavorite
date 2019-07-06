@@ -505,7 +505,6 @@ global_router_on_body_keypress = None
 
 def initialise_global_router_callbacks():
 
-    @js.Function
     @output_exceptions
     def router_on_body_mousemove(e):
         if Router.router:
@@ -513,7 +512,6 @@ def initialise_global_router_callbacks():
     global global_router_on_body_mousemove
     global_router_on_body_mousemove = router_on_body_mousemove
 
-    @js.Function
     @output_exceptions
     def router_on_hash_change(e):
         if Router.router:
@@ -521,7 +519,6 @@ def initialise_global_router_callbacks():
     global global_router_on_hash_change
     global_router_on_hash_change = router_on_hash_change
 
-    @js.Function
     @output_exceptions
     def router_on_body_click(e):
         if Router.router:
@@ -529,7 +526,6 @@ def initialise_global_router_callbacks():
     global global_router_on_body_click
     global_router_on_body_click = router_on_body_click
 
-    @js.Function
     @output_exceptions
     def router_on_body_keydown(e):
         if Router.router:
@@ -537,7 +533,6 @@ def initialise_global_router_callbacks():
     global global_router_on_body_keydown
     global_router_on_body_keydown = router_on_body_keydown
 
-    @js.Function
     @output_exceptions
     def router_on_body_keyup(e):
         if Router.router:
@@ -545,7 +540,6 @@ def initialise_global_router_callbacks():
     global global_router_on_body_keyup
     global_router_on_body_keyup = router_on_body_keyup
 
-    @js.Function
     @output_exceptions
     def router_on_body_keypress(e):
         if Router.router:
