@@ -103,18 +103,18 @@ return_get_elements_by_class_name = None
 def getElementsByClassName(class_name):
     return return_get_elements_by_class_name[class_name]
 
-body = MockElement()
+_body = MockElement()
 
-document = Mock(createElement=createElement,
+_document = Mock(createElement=createElement,
                 createElementNS=createElementNS,
                 createTextNode=createTextNode,
                 getElementById=getElementById,
                 getElementsByClassName=getElementsByClassName,
-                body=body)
+                body=_body)
 
-window = MagicMock(innerHeight=800)
+_window = MagicMock(innerHeight=800)
 
-globals = MagicMock(document=document, window=window)
+globals = MagicMock(document=_document, window=_window)
 
 def Function(fn):
     def wrapper(*args, **kwargs):
