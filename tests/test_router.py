@@ -14,7 +14,7 @@ class TestRouter(object):
     def test_router_stores_statically(self, monkeypatch):
         monkeypatch.setattr(cavorite, 'js', js)
 
-        body = js.globals.document.body
+        body = js.document.body
 
         welcome_page = c("div", [c("p", "Welcome to cavorite"),
                                  ])
@@ -31,7 +31,7 @@ class TestRouter(object):
     def test_router_passes_body_clicks_to_view(self, monkeypatch):
         monkeypatch.setattr(cavorite, 'js', js)
 
-        body = js.globals.document.body
+        body = js.document.body
 
         welcome_page = c("div", [c("p", "Welcome to cavorite"),
                                  ])
@@ -96,7 +96,7 @@ class TestRouter(object):
     def test_router_handles_global_mousemove(self, monkeypatch):
         monkeypatch.setattr(cavorite, 'js', js)
 
-        body = js.globals.document.body
+        body = js.document.body
 
         welcome_page = c("div", [c("p", "Welcome to cavorite"),
                                  ])
@@ -137,9 +137,9 @@ class TestRouter(object):
 
         monkeypatch.setattr(cavorite, 'js', js)
 
-        body = js.globals.document.body
+        body = js.document.body
 
-        js.globals.window.location.href = '#!editor/d8fb8497-fb86-4dea-bd9c-49ad883b7a84'
+        js.window.location.href = '#!editor/d8fb8497-fb86-4dea-bd9c-49ad883b7a84'
 
         def editor_page():
             return EditorView()

@@ -24,7 +24,7 @@ class Modal(div):
         self.body = body
         self.onclickhandler = onclickhandler
         def handle_ok2(e):
-            jquery = js.globals['$']
+            jquery = js['$']
             jquery('#' + id).modal('hide')
         self.handle_ok2 = handle_ok2
         super(Modal, self).__init__({'class': "modal fade", "id":id, "tabindex": "-1", "role": "dialog", "aria-labeledby": "{}Label".format(id), "aria-hidden": "true"})
@@ -47,9 +47,9 @@ class Modal(div):
                         control_values[str(node.getAttribute('id'))] = node.value
 
         if self.onclickhandler is not None:
-            IterateElements(js.globals.document.getElementById(self.id), control_values_callback)
+            IterateElements(js.document.getElementById(self.id), control_values_callback)
             self.onclickhandler(e, control_values)
-        jquery = js.globals['$']
+        jquery = js.jquery
         jquery('#' + self.id).modal('hide')
 
     def get_children(self):
@@ -72,5 +72,3 @@ class Modal(div):
                     ]),
                   ]),
                 ]
-
-

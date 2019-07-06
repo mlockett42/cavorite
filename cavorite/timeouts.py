@@ -49,7 +49,7 @@ def initialise_timeout_callbacks():
         del global_timeout_id_to_val[key]
         del global_timeout_val_to_id[val]
 
-    js.globals.document.cavorite_timeouthandler = cavorite_timeouthandler
+    js.document.cavorite_timeouthandler = cavorite_timeouthandler
 
     global global_cavorite_timeouthandler
     global_cavorite_timeouthandler = cavorite_timeouthandler
@@ -64,7 +64,7 @@ def initialise_timeout_callbacks():
 
         global_interval_callbacks[str(key)]()
 
-    js.globals.document.cavorite_intervalhandler = cavorite_intervalhandler
+    js.document.cavorite_intervalhandler = cavorite_intervalhandler
 
     global global_cavorite_intervalhandler
     global_cavorite_intervalhandler = cavorite_intervalhandler
@@ -75,7 +75,7 @@ def set_timeout(handler_fn, delay):
 
     global_timeout_callbacks[function_id] = handler_fn
 
-    val = js.globals.cavorite_setTimeout(function_id, delay)
+    val = js.cavorite_setTimeout(function_id, delay)
 
     global global_timeout_val_to_id
     global global_timeout_id_to_val
@@ -90,7 +90,7 @@ def clear_timeout(val):
     global global_timeout_id_to_val
     global global_timeout_callbacks
 
-    js.globals.clearTimeout(val)
+    js.clearTimeout(val)
 
     if val in global_timeout_val_to_id:
         # Sometimes we appear to can called the clear a timeout that someone
@@ -107,7 +107,7 @@ def set_interval(handler_fn, delay):
 
     global_interval_callbacks[function_id] = handler_fn
 
-    val = js.globals.cavorite_setInterval(function_id, delay)
+    val = js.cavorite_setInterval(function_id, delay)
 
     global global_interval_val_to_id
     global global_interval_id_to_val
@@ -122,7 +122,7 @@ def clear_interval(val):
     global global_interval_id_to_val
     global global_interval_callbacks
 
-    js.globals.clearInterval(val)
+    js.clearInterval(val)
 
     if val in global_interval_val_to_id:
         # Sometimes we appear to can called the clear a timeout that someone

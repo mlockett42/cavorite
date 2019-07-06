@@ -36,7 +36,7 @@ class TestMountListener(object):
 
         assert counter['count'] == 0
 
-        r = Router({ }, defaultroute, js.globals.document.body)
+        r = Router({ }, defaultroute, js.document.body)
         r.route()
 
         assert counter['count'] == 1 * 3
@@ -50,4 +50,3 @@ class TestMountListener(object):
         defaultroute.mount_redraw()
 
         assert counter['count'] == 3 * 3
-

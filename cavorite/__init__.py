@@ -34,7 +34,7 @@ class TextNode(object):
         self.parent = None
 
     def _render(self, element):
-        self.dom_element = js.globals.document.createTextNode(lazy_eval(self.text))
+        self.dom_element = js.document.createTextNode(lazy_eval(self.text))
         return self.dom_element
 
     def was_mounted(self):
@@ -144,7 +144,7 @@ class VNode(object):
         return ret
 
     def _createDOMElement(self, tag):
-        return js.globals.document.createElement(tag)
+        return js.document.createElement(tag)
 
     def _render(self, element):
         # Output this nvnode and its children to the DOM
@@ -180,8 +180,8 @@ class VNode(object):
     def attach_script_nodes(self, element):
         # Script nodes are helper objects for callbacks they need to be inserted manually
         def add_script_element(script_text):
-            scriptTextNode = js.globals.document.createTextNode(script_text)
-            scriptElement = js.globals.document.createElement('script')
+            scriptTextNode = js.document.createTextNode(script_text)
+            scriptElement = js.document.createElement('script')
             scriptElement.appendChild(scriptTextNode)
             element.appendChild(scriptElement)
 
@@ -566,24 +566,24 @@ class Router(object):
         self.routes = routes
         self.defaultroute = defaultroute
         self.dom_element = dom_element
-        js.globals.document.body.onhashchange=global_router_on_hash_change
-        js.globals.document.onclick=global_router_on_body_click
+        js.document.body.onhashchange=global_router_on_hash_change
+        js.document.onclick=global_router_on_body_click
         Router.router = self
         self.selected_route = None
 
-        js.globals.document.onmousemove = global_router_on_body_mousemove
+        js.document.onmousemove = global_router_on_body_mousemove
         self.on_body_mousemove_js_function = global_router_on_body_mousemove
         self.global_mouse_x = 0
         self.global_mouse_y = 0
-        js.globals.document.onkeyup = global_router_on_body_keyup
-        js.globals.document.onkeydown = global_router_on_body_keydown
-        js.globals.document.onkeypress = global_router_on_body_keypress
+        js.document.onkeyup = global_router_on_body_keyup
+        js.document.onkeydown = global_router_on_body_keydown
+        js.document.onkeypress = global_router_on_body_keypress
 
     def get_selected_route(self):
         # Returns the selected route and the url_kwargs as a tuple. This is
         # becuase the route can be a callable. This function can be overridden
         # by a subclass. If there are no url kwargs return an empty dict
-        url_sections = str(js.globals.window.location.href).split('#!', 1)
+        url_sections = str(js.window.location.href).split('#!', 1)
         if len(url_sections) == 2:
             url = url_sections[1]
         else:
@@ -614,9 +614,9 @@ class Router(object):
 
     def ResetHashChange(self):
         # Bootstrap modifies the handchange handler so we manually switch it back here
-        js.globals.document.body.onhashchange=global_router_on_hash_change
-        js.globals.document.onclick=global_router_on_body_click
-        js.globals.document.onmousemove = self.on_body_mousemove_js_function
+        js.document.body.onhashchange=global_router_on_hash_change
+        js.document.onclick=global_router_on_body_click
+        js.document.onmousemove = self.on_body_mousemove_js_function
         import gc
         gc.collect()
 
@@ -642,7 +642,7 @@ class Router(object):
         self.selected_route.on_body_keypress(e)
 
 def get_current_hash():
-    return str(js.globals.window.location.hash)
+    return str(js.window.location.hash)
 
 def get_uuid():
     return uuid.uuid4()

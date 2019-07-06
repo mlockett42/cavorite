@@ -34,7 +34,7 @@ class TestAjaxGetBehaviour(object):
 
         defaultroute = c('p', 'Hello world')
 
-        r = Router({ }, defaultroute, js.globals.document.body)
+        r = Router({ }, defaultroute, js.document.body)
         r.route()
 
         counter = dict()
@@ -50,7 +50,7 @@ class TestAjaxGetBehaviour(object):
         assert counter['count'] == 0
 
         xmlhttp = Mock()
-        js.globals.document.cavorite_AjaxGetCallback(xmlhttp, str(dummy_uuid()), {'hello': 'world'})
+        js.document.cavorite_AjaxGetCallback(xmlhttp, str(dummy_uuid()), {'hello': 'world'})
 
         assert counter['count'] == 1
         assert len(ajaxget.global_ajaxget_callbacks) == 0
@@ -70,7 +70,7 @@ class TestAjaxPostBehaviour(object):
 
         defaultroute = c('p', 'Hello world')
 
-        r = Router({ }, defaultroute, js.globals.document.body)
+        r = Router({ }, defaultroute, js.document.body)
         r.route()
 
         counter = dict()
@@ -86,7 +86,7 @@ class TestAjaxPostBehaviour(object):
         assert counter['count'] == 0
 
         xmlhttp = Mock()
-        js.globals.document.cavorite_AjaxPostCallback(xmlhttp, str(dummy_uuid()), 'OK')
+        js.document.cavorite_AjaxPostCallback(xmlhttp, str(dummy_uuid()), 'OK')
 
         assert counter['count'] == 1
         assert len(ajaxget.global_ajaxpost_callbacks) == 0
@@ -107,7 +107,7 @@ class TestAjaxPutBehaviour(object):
 
         defaultroute = c('p', 'Hello world')
 
-        r = Router({ }, defaultroute, js.globals.document.body)
+        r = Router({ }, defaultroute, js.document.body)
         r.route()
 
         counter = dict()
@@ -123,7 +123,7 @@ class TestAjaxPutBehaviour(object):
         assert counter['count'] == 0
 
         xmlhttp = Mock()
-        js.globals.document.cavorite_AjaxPutCallback(xmlhttp, str(dummy_uuid()), 'OK')
+        js.document.cavorite_AjaxPutCallback(xmlhttp, str(dummy_uuid()), 'OK')
 
         assert counter['count'] == 1
         assert len(ajaxget.global_ajaxput_callbacks) == 0
@@ -143,7 +143,7 @@ class TestAjaxDeleteBehaviour(object):
 
         defaultroute = c('p', 'Hello world')
 
-        r = Router({ }, defaultroute, js.globals.document.body)
+        r = Router({ }, defaultroute, js.document.body)
         r.route()
 
         counter = dict()
@@ -159,7 +159,7 @@ class TestAjaxDeleteBehaviour(object):
         assert counter['count'] == 0
 
         xmlhttp = Mock()
-        js.globals.document.cavorite_AjaxDeleteCallback(xmlhttp, str(dummy_uuid()), 'OK')
+        js.document.cavorite_AjaxDeleteCallback(xmlhttp, str(dummy_uuid()), 'OK')
 
         assert counter['count'] == 1
         assert len(ajaxget.global_ajaxdelete_callbacks) == 0
@@ -184,7 +184,7 @@ class TestAjaxErrorHandlingBehaviour(object):
 
         defaultroute = c('p', 'Hello world')
 
-        r = Router({ }, defaultroute, js.globals.document.body)
+        r = Router({ }, defaultroute, js.document.body)
         r.route()
 
         ajax_fn()
@@ -198,23 +198,23 @@ class TestAjaxErrorHandlingBehaviour(object):
     def test_get_request_errors_are_handled_correctly(self, monkeypatch, capsys):
         self.gen_request_errors_are_handled_correctly(monkeypatch, capsys,
             lambda: ajaxget.ajaxget('/hello_world', self.dummy_callback),
-            lambda: js.globals.document.cavorite_AjaxGetCallback(Mock(), str(self.dummy_uuid()), 'OK'),
+            lambda: js.document.cavorite_AjaxGetCallback(Mock(), str(self.dummy_uuid()), 'OK'),
             )
 
     def test_post_request_errors_are_handled_correctly(self, monkeypatch, capsys):
         self.gen_request_errors_are_handled_correctly(monkeypatch, capsys,
             lambda: ajaxget.ajaxpost('/hello_world', {'key': 'value'}, self.dummy_callback),
-            lambda: js.globals.document.cavorite_AjaxPostCallback(Mock(), str(self.dummy_uuid()), 'OK'),
+            lambda: js.document.cavorite_AjaxPostCallback(Mock(), str(self.dummy_uuid()), 'OK'),
             )
 
     def test_put_request_errors_are_handled_correctly(self, monkeypatch, capsys):
         self.gen_request_errors_are_handled_correctly(monkeypatch, capsys,
             lambda: ajaxget.ajaxput('/hello_world', {'key': 'value'}, self.dummy_callback),
-            lambda: js.globals.document.cavorite_AjaxPutCallback(Mock(), str(self.dummy_uuid()), 'OK'),
+            lambda: js.document.cavorite_AjaxPutCallback(Mock(), str(self.dummy_uuid()), 'OK'),
             )
 
     def test_delete_request_errors_are_handled_correctly(self, monkeypatch, capsys):
         self.gen_request_errors_are_handled_correctly(monkeypatch, capsys,
             lambda: ajaxget.ajaxdelete('/hello_world', self.dummy_callback),
-            lambda: js.globals.document.cavorite_AjaxDeleteCallback(Mock(), str(self.dummy_uuid()), 'OK'),
+            lambda: js.document.cavorite_AjaxDeleteCallback(Mock(), str(self.dummy_uuid()), 'OK'),
             )

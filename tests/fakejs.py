@@ -105,16 +105,14 @@ def getElementsByClassName(class_name):
 
 _body = MockElement()
 
-_document = Mock(createElement=createElement,
+document = Mock(createElement=createElement,
                 createElementNS=createElementNS,
                 createTextNode=createTextNode,
                 getElementById=getElementById,
                 getElementsByClassName=getElementsByClassName,
                 body=_body)
 
-_window = MagicMock(innerHeight=800)
-
-globals = MagicMock(document=_document, window=_window)
+window = MagicMock(innerHeight=800)
 
 def Function(fn):
     def wrapper(*args, **kwargs):
@@ -128,4 +126,20 @@ def IterateElements(node, callback):
     for child in node.children.l:
         IterateElements(child, callback)
 
-null = None
+cavorite_setInterval = Mock()
+
+cavorite_setTimeout = Mock()
+
+clearInterval = Mock()
+
+clearTimeout = Mock()
+
+jquery = Mock()
+
+cavorite_ajaxDelete = Mock()
+
+cavorite_ajaxPut = Mock()
+
+cavorite_ajaxPost = Mock()
+
+cavorite_ajaxGet = Mock()

@@ -26,24 +26,24 @@ class TestTimeoutBehaviour(object):
         default_p = c('p', [defaulttext])
         defaultroute = c('div', [default_p])
 
-        r = Router({ }, defaultroute, js.globals.document.body)
+        r = Router({ }, defaultroute, js.document.body)
         r.route()
 
-        scripts = [e for e in js.globals.document.body.children.l if e.tagName.lower() == 'script']
+        scripts = [e for e in js.document.body.children.l if e.tagName.lower() == 'script']
 
         assert len(scripts) == 8
 
         defaultroute.attribs = {'class': 'stuff'}
         defaultroute.mount_redraw()
 
-        scripts = [e for e in js.globals.document.body.children.l if e.tagName.lower() == 'script']
+        scripts = [e for e in js.document.body.children.l if e.tagName.lower() == 'script']
 
         assert len(scripts) == 8
 
         defaulttext.text = 'Hello world2'
         defaultroute.mount_redraw()
 
-        scripts = [e for e in js.globals.document.body.children.l if e.tagName.lower() == 'script']
+        scripts = [e for e in js.document.body.children.l if e.tagName.lower() == 'script']
 
         assert len(scripts) == 8
 
@@ -60,7 +60,7 @@ class TestTimeoutBehaviour(object):
 
         defaultroute = c('p', 'Hello world')
 
-        r = Router({ }, defaultroute, js.globals.document.body)
+        r = Router({ }, defaultroute, js.document.body)
         r.route()
 
         counter = dict()
@@ -78,7 +78,7 @@ class TestTimeoutBehaviour(object):
 
         assert counter['count'] == 0
 
-        js.globals.document.cavorite_timeouthandler(str(dummy_uuid()))
+        js.document.cavorite_timeouthandler(str(dummy_uuid()))
 
         assert counter['count'] == 1
         assert len(timeouts.global_timeout_callbacks) == 0
@@ -98,7 +98,7 @@ class TestTimeoutBehaviour(object):
 
         defaultroute = c('p', 'Hello world')
 
-        r = Router({ }, defaultroute, js.globals.document.body)
+        r = Router({ }, defaultroute, js.document.body)
         r.route()
 
         counter = dict()
@@ -136,7 +136,7 @@ class TestTimeoutBehaviour(object):
 
         defaultroute = c('p', 'Hello world')
 
-        r = Router({ }, defaultroute, js.globals.document.body)
+        r = Router({ }, defaultroute, js.document.body)
         r.route()
 
         counter = dict()
@@ -154,7 +154,7 @@ class TestTimeoutBehaviour(object):
 
         assert counter['count'] == 0
 
-        js.globals.document.cavorite_intervalhandler(str(dummy_uuid()))
+        js.document.cavorite_intervalhandler(str(dummy_uuid()))
 
         assert counter['count'] == 1
         assert set(timeouts.global_interval_callbacks.keys()) == {str(dummy_uuid())}
@@ -174,7 +174,7 @@ class TestTimeoutBehaviour(object):
 
         defaultroute = c('p', 'Hello world')
 
-        r = Router({ }, defaultroute, js.globals.document.body)
+        r = Router({ }, defaultroute, js.document.body)
         r.route()
 
         counter = dict()
@@ -192,7 +192,7 @@ class TestTimeoutBehaviour(object):
 
         assert counter['count'] == 0
 
-        js.globals.document.cavorite_intervalhandler(str(dummy_uuid()))
+        js.document.cavorite_intervalhandler(str(dummy_uuid()))
 
         assert counter['count'] == 1
 
@@ -220,7 +220,7 @@ class TestTimeoutErrorBehaviour(object):
 
         defaultroute = c('p', 'Hello world')
 
-        r = Router({ }, defaultroute, js.globals.document.body)
+        r = Router({ }, defaultroute, js.document.body)
         r.route()
 
         def dummy_callback():
@@ -229,7 +229,7 @@ class TestTimeoutErrorBehaviour(object):
         val = timeouts.set_timeout(dummy_callback, 1)
 
         with pytest.raises(AssertionError):
-            js.globals.document.cavorite_timeouthandler(str(dummy_uuid()))
+            js.document.cavorite_timeouthandler(str(dummy_uuid()))
 
         out, err = capsys.readouterr()
         assert 'AssertionError' in out
@@ -247,7 +247,7 @@ class TestTimeoutErrorBehaviour(object):
 
         defaultroute = c('p', 'Hello world')
 
-        r = Router({ }, defaultroute, js.globals.document.body)
+        r = Router({ }, defaultroute, js.document.body)
         r.route()
 
         def dummy_callback():
@@ -256,7 +256,7 @@ class TestTimeoutErrorBehaviour(object):
         val = timeouts.set_interval(dummy_callback, 1)
 
         with pytest.raises(AssertionError):
-            js.globals.document.cavorite_intervalhandler(str(dummy_uuid()))
+            js.document.cavorite_intervalhandler(str(dummy_uuid()))
 
         out, err = capsys.readouterr()
         assert 'AssertionError' in out

@@ -33,7 +33,7 @@ def initialise_ajaxget_callbacks():
 
         del global_ajaxget_callbacks[key]
 
-    js.globals.document.cavorite_AjaxGetCallback = cavorite_ajaxgethandler
+    js.document.cavorite_AjaxGetCallback = cavorite_ajaxgethandler
 
     global global_cavorite_ajaxgethandler
     global_cavorite_ajaxgethandler = cavorite_ajaxgethandler
@@ -52,7 +52,7 @@ def initialise_ajaxget_callbacks():
 
         del global_ajaxpost_callbacks[key]
 
-    js.globals.document.cavorite_AjaxPostCallback = cavorite_ajaxposthandler
+    js.document.cavorite_AjaxPostCallback = cavorite_ajaxposthandler
 
     global global_cavorite_ajaxposthandler
     global_cavorite_ajaxposthandler = cavorite_ajaxposthandler
@@ -71,7 +71,7 @@ def initialise_ajaxget_callbacks():
 
         del global_ajaxput_callbacks[key]
 
-    js.globals.document.cavorite_AjaxPutCallback = cavorite_ajaxputhandler
+    js.document.cavorite_AjaxPutCallback = cavorite_ajaxputhandler
 
     global global_cavorite_ajaxputhandler
     global_cavorite_ajaxputhandler = cavorite_ajaxputhandler
@@ -90,7 +90,7 @@ def initialise_ajaxget_callbacks():
 
         del global_ajaxdelete_callbacks[key]
 
-    js.globals.document.cavorite_AjaxDeleteCallback = cavorite_ajaxdeletehandler
+    js.document.cavorite_AjaxDeleteCallback = cavorite_ajaxdeletehandler
 
     global global_cavorite_ajaxdeletehandler
     global_cavorite_ajaxdeletehandler = cavorite_ajaxdeletehandler
@@ -104,7 +104,7 @@ def ajaxget(url, handler_fn):
 
     global_ajaxget_callbacks[function_id] = handler_fn
 
-    val = js.globals.cavorite_ajaxGet(url, function_id)
+    val = js.cavorite_ajaxGet(url, function_id)
 
 def ajaxpost(url, data, handler_fn):
     # Called be application code to execute an AJAX GET request
@@ -114,7 +114,7 @@ def ajaxpost(url, data, handler_fn):
 
     global_ajaxpost_callbacks[function_id] = handler_fn
 
-    val = js.globals.cavorite_ajaxPost(url, function_id, data)
+    val = js.cavorite_ajaxPost(url, function_id, data)
 
 def ajaxput(url, data, handler_fn):
     # Called be application code to execute an AJAX GET request
@@ -124,7 +124,7 @@ def ajaxput(url, data, handler_fn):
 
     global_ajaxput_callbacks[function_id] = handler_fn
 
-    val = js.globals.cavorite_ajaxPut(url, function_id, data)
+    val = js.cavorite_ajaxPut(url, function_id, data)
 
 def ajaxdelete(url, handler_fn):
     # Called be application code to execute an AJAX GET request
@@ -134,4 +134,4 @@ def ajaxdelete(url, handler_fn):
 
     global_ajaxdelete_callbacks[function_id] = handler_fn
 
-    val = js.globals.cavorite_ajaxDelete(url, function_id)
+    val = js.cavorite_ajaxDelete(url, function_id)
